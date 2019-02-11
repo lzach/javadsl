@@ -94,9 +94,10 @@ public class ExpandedExpansion {
     listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "java"), AST.create("IDLit", "util"), AST.create("IDLit", "Arrays"))}));
     listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "java"), AST.create("IDLit", "util"), AST.create("IDLit", "Map"))}));
     listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "java"), AST.create("IDLit", "util"), AST.create("IDLit", "HashMap"))}));
+    listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "java"), AST.create("IDLit", "util"), AST.create("IDLit", "Deque"))}));
     listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "java"), AST.create("IDLit", "util"), AST.create("IDLit", "ArrayDeque"))}));
-    listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "domain2"), AST.create("IDLit", "ast"), AST.create("IDLit", "AST"))}));
-    listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "domain2"), AST.create("IDLit", "ast"), AST.create("IDLit", "ASTBuilder"))}));
+    listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "dsl"), AST.create("IDLit", "ast"), AST.create("IDLit", "AST"))}));
+    listAST.add(new AST("Import", new Object[]{"name", new AST("Name", AST.create("IDLit", "dsl"), AST.create("IDLit", "ast"), AST.create("IDLit", "ASTBuilder"))}));
 
     ASTBuilder clsAST = new ASTBuilder("Class");
     clsAST.add("modifier", AST.create("IDLit", "public"));
@@ -142,7 +143,7 @@ public class ExpandedExpansion {
                              new Object[]{"code", new ASTBuilder("Block").add(new AST("Select", new Object[]{"value", new AST("Call",
                                     new Object[]{"function", new AST("Member", new Object[]{"lhs", AST.create("IDLit", "ast")},
                                                            new Object[]{"rhs", AST.create("IDLit", "getTypeName")})},
-                                    new Object[]{"args", new AST("ArgList", new AST[0])})}, new Object[]{"block", new AST("Block",
+                                    new Object[]{"args", new AST("ArgList", new AST[0])})}, new Object[]{"block", new AST("List",
                                     methodListExpansions.create(),
                                  new AST("Return", new Object[]{"value", AST.create("IDLit", "null")})
                              )})).create()}));
@@ -177,7 +178,7 @@ public class ExpandedExpansion {
   private AST expandFunction(AST ast) {
     ASTBuilder methodAST = new ASTBuilder("Method");
     methodAST.add("returnType", AST.create("IDLit", "AST"));
-    methodAST.add("name", AST.create("IDLit", /* typeName */ast.getTypeName()));
+    methodAST.add("name", AST.create("IDLit", /* member */ast.get("name")));
     /* concat */
     ASTBuilder paramsAST = new ASTBuilder("Params");
     paramsAST.add(new AST("Param", new Object[]{"name", AST.create("IDLit", "ast")}, new Object[]{"type", AST.create("IDLit", "AST")}));
