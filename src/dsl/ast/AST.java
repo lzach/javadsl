@@ -2,6 +2,7 @@ package dsl.ast;
 
 import dsl.Context;
 import dsl.Type;
+import dsl.parser.Token;
 
 import java.util.*;
 
@@ -10,6 +11,7 @@ public class AST {
   private final Map<String, AST> members;
   private final Object value;
   private final AST[] memberList;
+  private final Token fromToken;
   private boolean checked = false;
 
   public AST(String type, Map<String, AST> members) {
@@ -17,6 +19,15 @@ public class AST {
     this.members = members;
     this.value = null;
     this.memberList = null;
+    this.fromToken  = Token.UNKOWN;
+  }
+
+  public AST(String type, Map<String, AST> members, Token fromToken) {
+    this.typeName = type;
+    this.members = members;
+    this.value = null;
+    this.memberList = null;
+    this.fromToken = fromToken;
   }
 
   public AST(String type, Object[] ... members) {
@@ -24,13 +35,31 @@ public class AST {
     this.members = listOfListToMap(members);
     this.value = null;
     this.memberList = null;
+    this.fromToken  = Token.UNKOWN;
   }
 
-  public AST(String type, Object value) {
+  public AST(String type, Token fromToken, Object[] ... members) {
+    this.typeName = type;
+    this.members = listOfListToMap(members);
+    this.value = null;
+    this.memberList = null;
+    this.fromToken = fromToken;
+  }
+
+  private AST(String type, Object value) {
     this.typeName = type;
     this.members = null;
     this.value = value;
     this.memberList = null;
+    this.fromToken  = Token.UNKOWN;
+  }
+
+  public AST(String type, Object value, Token fromToken) {
+    this.typeName = type;
+    this.members = null;
+    this.value = value;
+    this.memberList = null;
+    this.fromToken = fromToken;
   }
 
   public AST(String type, AST... memberList) {
@@ -38,7 +67,17 @@ public class AST {
     this.members = null;
     this.value = null;
     this.memberList = memberList;
+    this.fromToken  = Token.UNKOWN;
   }
+
+  public AST(String type, Token fromToken, AST... memberList) {
+    this.typeName = type;
+    this.members = null;
+    this.value = null;
+    this.memberList = memberList;
+    this.fromToken = fromToken;
+  }
+
 
   public String getMemberType() {
     return isMembers() ? "Members" : isList() ? "List" : "Value";
@@ -53,6 +92,10 @@ public class AST {
     return new AST(type, value);
   }
 
+  public static AST create(String typeName, Object value, Token token) {
+    return new AST(typeName, value, token);
+  }
+
   public Object getValue() {
     return value;
   }
@@ -65,11 +108,11 @@ public class AST {
 
     if (members != null) {
       if (type.getArrayType() != null) {
-        throw new InvalidAstException(type.getName() + " is an array, not a language construct");
+        throw new InvalidAstException(type.getName() + " is an array, not a language construct" + tokenError());
       }
 
       if (members.size() > 0 && type.getMember("arguments").equals("None")) {
-        throw new InvalidAstException(type.getName() + " does not take any parameters");
+        throw new InvalidAstException(type.getName() + " does not take any parameters" + tokenError());
       }
       Map<String, String> argMembers = ctx.getType(type.getMember("arguments")).getMembers();
       if (argMembers.size() > members.size()) {
@@ -82,7 +125,7 @@ public class AST {
         if (missing.length() > 2) {
           missing = new StringBuilder(missing.substring(0, missing.length() - 2));
         }
-        throw new InvalidAstException(type.getName() + " missing members(s): " + missing);
+        throw new InvalidAstException(type.getName() + " missing members(s): " + missing + tokenError());
       }
       for (String name : members.keySet()) {
         AST ast = members.get(name);
@@ -90,34 +133,34 @@ public class AST {
           ast.check(ctx);
         }
         if (!argMembers.containsKey(name)) {
-          throw new InvalidAstException(type.getName() + " doesn't have a member called " + name);
+          throw new InvalidAstException(type.getName() + " doesn't have a member called " + name + tokenError());
         }
         Type argType = ctx.getType(argMembers.get(name));
         if (!ctx.supertype(argType, ctx.getType(ast.typeName))) {
           if (ctx.supertype(ctx.getType(ast.typeName), argType)) {
             members.put(name, ast.downcast(ctx, argType.getName()));
           } else {
-            throw new InvalidAstException(type.getName() + "." + name + "(" + ast.typeName + ") should be of type " + argMembers.get(name));
+            throw new InvalidAstException(type.getName() + "." + name + "(" + ast.typeName + ") should be of type " + argMembers.get(name) + tokenError());
           }
         }
       }
     } else if (value != null) {
       if (type.isArray()) {
-        throw new InvalidAstException(type.getName() + " is an array, not a literal");
+        throw new InvalidAstException(type.getName() + " is an array, not a literal" + tokenError());
       }
       if (!type.getMember("arguments").equals("None")) {
-        throw new InvalidAstException(type.getName() + " does not take any parameters");
+        throw new InvalidAstException(type.getName() + " does not take any parameters" + tokenError());
       }
       if (!(type.getMember("returns").equals("LiteralType"))) {
-        throw new InvalidAstException(type.getName() + " does not produce a literal");
+        throw new InvalidAstException(type.getName() + " does not produce a literal" + tokenError());
       }
       Type t = ctx.getType(type.getMember("returns"));
       if (!t.contains(value)) {
-        throw new InvalidAstException(type.getName() + " requires objects of type " + t.getName());
+        throw new InvalidAstException(type.getName() + " requires objects of type " + t.getName() + tokenError());
       }
     } else if (memberList != null) {
       if (type.getArrayType() == null) {
-        throw new InvalidAstException(type.getName() + " is not an array");
+        throw new InvalidAstException(type.getName() + " is not an array" + tokenError());
       }
       Type arrayType = ctx.getType(type.getArrayType());
       int i = 0;
@@ -126,13 +169,17 @@ public class AST {
           ast.check(ctx);
         }
         if (!ctx.supertype(arrayType, ctx.getType(ast.typeName))) {
-          throw new InvalidAstException(type.getName() + "[" + i + "] (" + ast.typeName + ") should be of type " + arrayType.getName());
+          throw new InvalidAstException(type.getName() + "[" + i + "] (" + ast.typeName + ") should be of type " + arrayType.getName() + tokenError());
         }
         i += 1;
       }
     }
     assert ((value == null ? 0 : 1) + (memberList == null ? 0 : 1) + (members == null ? 0 : 1) == 1);
     checked = true;
+  }
+
+  private String tokenError() {
+    return " " + fromToken.toString() + "\n\n" + fromToken.errorString();
   }
 
   private AST downcast(Context ctx, String nType) {
@@ -175,7 +222,7 @@ public class AST {
 
   public AST get(String member) {
     if (members == null || !members.containsKey(member)) {
-      throw new InvalidAstException("Can't access member " + member + ", not a labeled ast or member doesn't exist");
+      throw new InvalidAstException("Can't access member " + member + ", not a labeled ast or member doesn't exist" + tokenError());
     }
     return members.get(member);
   }

@@ -40,6 +40,7 @@ public class Parser {
     expect(OP, "(");
     Token name = expect(Token.Type.ID);
     builder.setName(name.getValue());
+    builder.setToken(name);
     if (has(Token.Type.ID)) {
       Token id = next();
       if ( has(OP, ":") ) {
@@ -95,7 +96,7 @@ public class Parser {
       default:
         throw new InvalidAstException("Expected a literal value");
     }
-    return AST.create(typ + "Lit", val);
+    return AST.create(typ + "Lit", val, value);
   }
 
   protected boolean eof() {

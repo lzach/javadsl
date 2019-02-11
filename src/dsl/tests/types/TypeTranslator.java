@@ -8,10 +8,10 @@ public class TypeTranslator implements AstTranslator {
   public AST translate(AST ast) {
     switch (ast.getTypeName()) {
       case "Type":
-        return new AST("Class", new Object[]{"name",    new AST("String", "Type")},
-                                      new Object[]{"attrs",   new AST("list", new AST("Attr", new Object[]{"name", new AST("String", "..")},
-                                                                                                          new Object[]{"value", new AST("String", "...")}))},
-                                      new Object[]{"methods", new AST("list", (Object)null)});
+        return new AST("Class", new Object[]{"name",    AST.create("String", "Type")},
+                                      new Object[]{"attrs",   AST.create("list", new AST("Attr", new Object[]{"name", AST.create("String", "..")},
+                                                                                                          new Object[]{"value", AST.create("String", "...")}))},
+                                      new Object[]{"methods", AST.create("list", (Object)null)});
       case "Relation":
         break;
       case "MemberPairList":

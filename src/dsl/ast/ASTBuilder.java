@@ -3,14 +3,16 @@ package dsl.ast;
 
 import dsl.Context;
 import dsl.Type;
+import dsl.parser.Token;
 
 import java.util.*;
 
-public class ASTBuilder {
+public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   private String typeName = null;
   private Map<String, AST> members = null;
   private List<AST> memberList = null;
   private Object value = null;
+  private Token token = null;
 
   /**
    * Create an ASTBuilder with a set initial Language typeName and some initial members.
@@ -53,7 +55,7 @@ public class ASTBuilder {
   }
 
 
-   public ASTBuilder(Map<String, AST> members) {
+  public ASTBuilder(Map<String, AST> members) {
     this.members = members;
   }
 
@@ -66,7 +68,11 @@ public class ASTBuilder {
   }
 
   public ASTBuilder(AST... memberList) {
-    this.memberList = Arrays.asList(memberList);
+    if ( memberList.length == 1 && memberList[0] == null ) {
+      this.memberList = new ArrayList<>();
+    } else {
+      this.memberList = Arrays.asList(memberList);
+    }
   }
   public ASTBuilder(List<AST>  memberList) {
     this.memberList = memberList;
@@ -75,14 +81,21 @@ public class ASTBuilder {
 
   public ASTBuilder() {}
 
-  public ASTBuilder add(String name, AST ast) {
+  public ASTBuilder setToken(Token token) {
+    this.token = token;
+    return this;
+  }
+
+  @Override
+  public ASTMemberBuilder add(String name, AST ast) {
     if ( members == null) {
       createMembers();
     }
     members.put(name, ast);
     return this;
   }
-  public ASTBuilder addAll(Map<String, AST> asts) {
+  @Override
+  public ASTMemberBuilder addAll(Map<String, AST> asts) {
     if ( members == null) {
       createMembers();
     }
@@ -90,14 +103,18 @@ public class ASTBuilder {
     return this;
   }
 
-  public ASTBuilder add(AST ast) {
+  @Override
+  public ASTListBuilder add(AST ast) {
     if ( memberList == null ) {
       createMemberList();
     }
-    memberList.add(ast);
+    if ( ast != null ) {
+      memberList.add(ast);
+    }
     return this;
   }
-  public ASTBuilder addAll(Collection<AST> asts) {
+  @Override
+  public ASTListBuilder addAll(Collection<AST> asts) {
     if ( memberList == null ) {
       createMemberList();
     }
@@ -124,7 +141,7 @@ public class ASTBuilder {
   }
 
   protected void createMembers() {
-    if ( memberList != null || value != null ) {
+    if ( !canHaveMembers() ) {
       throw new InvalidAstException("Can't both have members and values/arrays");
     }
     members = new HashMap<>();
@@ -134,7 +151,7 @@ public class ASTBuilder {
   }
 
   protected void createMemberList() {
-    if ( members != null || value != null ) {
+    if ( !canHaveMemberList() ) {
       throw new InvalidAstException("Can't both have arrays and values/members");
     }
     memberList = new ArrayList<>();
@@ -144,12 +161,13 @@ public class ASTBuilder {
   }
 
   protected void createValue(Object value) {
-    if ( memberList != null || members != null ) {
+    if ( !canHaveValues() ) {
       throw new InvalidAstException("Can't both have values and members/arrays");
     }
     this.value = value;
   }
 
+  @Override
   public AST create(Context ctx) {
     Type type = ctx.getType(typeName);
     if ( type == null ) {
@@ -183,17 +201,30 @@ public class ASTBuilder {
     return ast;
   }
 
+  @Override
   public AST create() {
 
     AST ast = null;
-    if ( members != null ) {
-      ast = new AST(typeName, members);
-    } else if ( memberList != null  ) {
-      ast = new AST(typeName, memberList.toArray(new AST[memberList.size()]));
-    } else if ( value != null ) {
-      ast = AST.create(typeName, value);
+    if ( token != null ) {
+      if (members != null) {
+        ast = new AST(typeName, members, token);
+      } else if (memberList != null) {
+        ast = new AST(typeName, token, memberList.toArray(new AST[memberList.size()]));
+      } else if (value != null) {
+        ast = AST.create(typeName, value, token);
+      } else {
+        ast = new AST(typeName, token, new AST[]{});
+      }
     } else {
-      ast = new AST(typeName, new AST[]{});
+      if (members != null) {
+        ast = new AST(typeName, members);
+      } else if (memberList != null) {
+        ast = new AST(typeName, memberList.toArray(new AST[memberList.size()]));
+      } else if (value != null) {
+        ast = AST.create(typeName, value);
+      } else {
+        ast = new AST(typeName, new AST[]{});
+      }
     }
     return ast;
   }

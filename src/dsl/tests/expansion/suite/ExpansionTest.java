@@ -34,6 +34,11 @@ public class ExpansionTest {
     assert exp != null;
     return exp;
   }
+  private static AST testExpandedExpansion(AST def) {
+    AST exp = new dsl.tests.expansion.ExpandedExpansion(def).expand();
+    assert exp != null;
+    return exp;
+  }
 
   private static String testJavaCompiler(AST astExp, String buildPath) {
     AST expans = testExpansion(astExp, astExp);
@@ -107,8 +112,19 @@ public class ExpansionTest {
     System.out.println("=== Java Code ===");
     String java = testJavaTranslator(expans);
     System.out.println(java);
-    String java2 = testJavaCompiler(ast, buildPath);
+
+
+    System.out.println("=== ExpandedExpansion ===");
+    AST expExpans = testExpandedExpansion(ast);
+    System.out.println(expExpans);
+
+    System.out.println("=== ExpandedJava Code ===");
+    String java2 = testJavaTranslator(expExpans);
     System.out.println(java2);
+
+
+    String java3 = testJavaCompiler(ast, buildPath);
+    System.out.println(java3);
   }
 
 }
