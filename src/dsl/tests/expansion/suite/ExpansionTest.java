@@ -7,6 +7,7 @@ import dsl.tests.java.JavaTranslator;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class ExpansionTest {
@@ -41,10 +42,11 @@ public class ExpansionTest {
   }
 
   private static String testJavaCompiler(AST astExp, String buildPath) {
-    AST expans = testExpansion(astExp, astExp);
+//    AST expans = testExpansion(astExp, astExp);
+    AST expans = testExpandedExpansion( astExp);
     String java = testJavaTranslator(expans);
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(
-        new FileOutputStream("ExpansionExpansion.java"), "utf-8"))) {
+        new FileOutputStream("ExpansionExpansion.java"), StandardCharsets.UTF_8))) {
       writer.write(java);
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
@@ -54,7 +56,7 @@ public class ExpansionTest {
       e.printStackTrace();
     }
     try {
-      Process pro = Runtime.getRuntime().exec("javac -d " + buildPath + " ExpansionExpansion.java");
+      Process pro = Runtime.getRuntime().exec("javac -d " + buildPath + " -cp " + buildPath + " ExpansionExpansion.java");
       pro.waitFor();
 
       BufferedReader is = new BufferedReader(new InputStreamReader(pro.getInputStream()));
@@ -100,7 +102,7 @@ public class ExpansionTest {
 
 
   public static void main(String[] args) throws FileNotFoundException {
-    String buildPath = "out/production/phd-code/";
+    String buildPath = "out/production/javadsl/";
     if ( args.length >= 1 ) {
       buildPath = args[0];
     }

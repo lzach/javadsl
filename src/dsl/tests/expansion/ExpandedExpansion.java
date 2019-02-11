@@ -113,7 +113,7 @@ public class ExpandedExpansion {
         funParams.add(new AST("String", new Object[]{"value", /* member */funParam.get("name")}));
       }
       functions.add(new AST("Call", new Object[]{"function", new AST("Member", new Object[]{"lhs", AST.create("IDLit", "funcMap")}, new Object[]{"rhs", AST.create("IDLit", "put")})},
-                                          new Object[]{"args", new AST("ArgList", new AST("Arg", new Object[]{"name", AST.create("IDLit", "key")}, new Object[]{"value", new AST("String", new Object[]{"value", /*member*/ast.get("name")})}),
+                                          new Object[]{"args", new AST("ArgList", new AST("Arg", new Object[]{"name", AST.create("IDLit", "key")}, new Object[]{"value", new AST("String", new Object[]{"value", /*member*/fun.get("name")})}),
                                                                                         new AST("Arg", new Object[]{"name", AST.create("IDLit", "value")}, new Object[]{"value",
                                                                                                                                   new AST("Call",
                                                                                                                                       new Object[]{"function",
@@ -134,17 +134,17 @@ public class ExpandedExpansion {
     /* members name:expansions */
     ASTBuilder methodListExpansions = new ASTBuilder("List");
     for (AST mLExp : ast.get("expansions").getMemberList()) {
-      methodListExpansions.add(new AST("Case", new Object[]{"value", new AST("String", new Object[]{"value", /* member */mLExp.get("type")}, new Object[]{"code", callExpansion(/*literalItem*/mLExp)})}));
+      methodListExpansions.add(new AST("Case", new Object[]{"value", new AST("String", new Object[]{"value", /* member */mLExp.get("type")})}, new Object[]{"block", callExpansion(/*literalItem*/mLExp)}));
     }
 
     methodList.add(new AST("Method", new Object[]{"returnType", AST.create("IDLit", "AST")}, new Object[]{"name", AST.create("IDLit", "expand")}, new Object[]{"params", new AST("ParamList",
                              new AST("Param", new Object[]{"name", AST.create("IDLit", "ast")}, new Object[]{"type", AST.create("IDLit", "AST")}))},
                              new Object[]{"code", new ASTBuilder("Block").add(new AST("Select", new Object[]{"value", new AST("Call",
                                     new Object[]{"function", new AST("Member", new Object[]{"lhs", AST.create("IDLit", "ast")},
-                                                           new Object[]{"rhs", AST.create("IDLit", "getTypeName")}),
-                                    new Object[]{"args", new AST("ArgList", new AST[0])}})}, new Object[]{"code", new AST("Block",
+                                                           new Object[]{"rhs", AST.create("IDLit", "getTypeName")})},
+                                    new Object[]{"args", new AST("ArgList", new AST[0])})}, new Object[]{"block", new AST("Block",
                                     methodListExpansions.create(),
-                                 new AST("Return", AST.create("IDLit", "null"))
+                                 new AST("Return", new Object[]{"value", AST.create("IDLit", "null")})
                              )})).create()}));
     /* members name:expansions */
     for ( AST fMeth : ast.get("expansions").getMemberList() ) {
@@ -177,6 +177,7 @@ public class ExpandedExpansion {
   private AST expandFunction(AST ast) {
     ASTBuilder methodAST = new ASTBuilder("Method");
     methodAST.add("returnType", AST.create("IDLit", "AST"));
+    methodAST.add("name", AST.create("IDLit", /* typeName */ast.getTypeName()));
     /* concat */
     ASTBuilder paramsAST = new ASTBuilder("Params");
     paramsAST.add(new AST("Param", new Object[]{"name", AST.create("IDLit", "ast")}, new Object[]{"type", AST.create("IDLit", "AST")}));
@@ -274,17 +275,26 @@ public class ExpandedExpansion {
                                                   .add("args", new AST("ArgList",new AST[0]))
                                                   .create())
                                           .create())
-                                  .add("rhs", AST.create("IDLit", "set"))
+                                  .add("rhs", AST.create("IDLit", "add"))
                                   .create())
                 .add("args", new ASTBuilder("ArgList")
                         .add(new ASTBuilder("Arg")
                                 .add("name", AST.create("IDLit", "name"))
                                 .add("value", new ASTBuilder("String")
-                                        .add("value", AST.create("IDLit",/*literalValue*/ast))
+                                        .add("value", AST.create("IDLit",/*itemKey*/key))
                                         .create())
                                 .create())
-                        .create())
-                .create());
+                        .add(new ASTBuilder("Arg")
+                            .add("name", AST.create("IDLit", "value"))
+                            .add("value", new ASTBuilder("Call")
+                                .add("function", new ASTBuilder("Member")
+                                    .add("lhs", AST.create("IDLit", "builder"))
+                                    .add("rhs", AST.create("IDLit", "create")).create())
+                                .add("args", new AST("ArgList", new AST[0]))
+                                .create())
+                            .create())
+                         .create())
+                 .create());
         astList.add(list.create());
       }
     }
@@ -342,6 +352,7 @@ public class ExpandedExpansion {
     astList.add(new ASTBuilder("Assign")
             .add("lhs", AST.create("IDLit", "builder"))
             .add("rhs", new ASTBuilder("Convert")
+                    .add("type", AST.create("IDLit", "ASTBuilder"))
                     .add("value", new ASTBuilder("Call")
                             .add("function", new ASTBuilder("Member")
                                     .add("lhs", AST.create("IDLit", "bQue"))
