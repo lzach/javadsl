@@ -78,6 +78,10 @@ public class AST {
     this.fromToken = fromToken;
   }
 
+  public static AST IDLit(String name) {
+    return create("IDLit", name);
+  }
+
 
   public String getMemberType() {
     return isMembers() ? "Members" : isList() ? "List" : "Value";
@@ -97,6 +101,8 @@ public class AST {
   }
 
   public Object getValue() {
+    if ( value instanceof Token )
+      return ((Token)value).getValue();
     return value;
   }
 

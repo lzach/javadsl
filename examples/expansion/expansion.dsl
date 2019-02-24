@@ -27,8 +27,12 @@
                  methods:(concat
                      (MethodList
                          (Method name:expand params:(ParamList (Param name:ast type:AST)) returnType:AST code:(Block
-                             (Select value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)) block:
-                                  (members name:expansions template:(Case value:(String value:(member name:type)) block:(callExpansion ast:(literalItem)))))
+                             (Select value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)) block:(List
+                                  (members name:expansions template:(Case value:(String value:(member name:type)) block:(callExpansion ast:(literalItem))))
+                                  (members name:functions template:(Case value:(String value:(member name:name)) block:(callFunction ast:(literalItem))))
+                                  (members name:operations template:(Case value:(String value:(member name:name)) block:(callOperation ast:(literalItem))))
+                                  (Default block:(callPlain ast:(literalItem)))
+                             ))
                              (Return value:(Call function:(Member lhs:AST rhs:create) args:(ArgList (Arg name:typeName value:(String value:"")))))
                          ))
                      )
@@ -55,8 +59,6 @@
       )))
   )
   functions:(FunctionList
-      (Function name:callExpansion params:(ParamList ) expansion:
-            (Return value:(Call function:(expFunName ast:(literalItem)) args:(ArgList (Arg name:ast value:ast)))))
       (Function name:expFunName params:(ParamList ) expansion:(concat expand (member name:type)))
       (Function name:expExpansion params:(ParamList ) expansion:(List
              (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:name value:(String value:(typeName))))))
@@ -78,9 +80,15 @@
              ) otherwise:(expExpansion ast:(literalItem))
           )
       ))
-      (Function name:getArgs params:(ParamList ) expansion:(concat (ArgList (Arg name:ast value:ast) (members template:(Arg name:(itemKey) value:(literalValue))))))
+      (Function name:getFunArgs params:(ParamList ) expansion:(concat (ArgList (Arg name:ast value:ast)) (member name:params template:(members template:(Arg name:(itemKey) value:(literalValue))))))
   )
   operations:(OpList
+     (Operation name:callExpansion params:(ParamList ) expansion:
+            (Return value:(Call function:(expFunName ast:(literalItem)) args:(ArgList (Arg name:ast value:ast)))))
+     (Operation name:callFunction params:(ParamList ) expansion:
+            (Return value:(Call function:(member name:name) args:(getFunArgs ast:(literalItem)))))
+     (Operation name:callOperation params:(ParamList ) expansion:
+            (expand  ast:(literalItem)  template:(member name:expansion template:(expandItem))))
      (Operation name:isMember params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isList params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isValue params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))

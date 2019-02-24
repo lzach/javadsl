@@ -43,7 +43,8 @@ public class ExpansionTest {
 
   private static String testJavaCompiler(AST astExp, String buildPath) {
 //    AST expans = testExpansion(astExp, astExp);
-    AST expans = testExpandedExpansion( astExp);
+//    AST expans = testExpandedExpansion( astExp);
+    AST expans = testExpandedSwitchExpansion( astExp);
     String java = testJavaTranslator(expans);
     try (Writer writer = new BufferedWriter(new OutputStreamWriter(
         new FileOutputStream("ExpansionExpansion.java"), StandardCharsets.UTF_8))) {
@@ -100,6 +101,12 @@ public class ExpansionTest {
     return null;
   }
 
+  private static AST testExpandedSwitchExpansion(AST def) {
+    AST exp = new dsl.tests.expansion.ExpandedSwitchExpansion(def).expand();
+    assert exp != null;
+    return exp;
+  }
+
 
   public static void main(String[] args) throws FileNotFoundException {
     String buildPath = "out/production/javadsl/";
@@ -108,21 +115,21 @@ public class ExpansionTest {
     }
     AST ast = testParser("examples/expansion/expansion.dsl");
     System.out.println(ast);
-    System.out.println("=== Expansion ===");
-    AST expans = testExpansion(ast, ast);
-    System.out.println(expans);
-    System.out.println("=== Java Code ===");
-    String java = testJavaTranslator(expans);
-    System.out.println(java);
+//    System.out.println("=== Expansion ===");
+//    AST expans = testExpansion(ast, ast);
+//    System.out.println(expans);
+//    System.out.println("=== Java Code ===");
+//    String java = testJavaTranslator(expans);
+//    System.out.println(java);
 
 
-    System.out.println("=== ExpandedExpansion ===");
-    AST expExpans = testExpandedExpansion(ast);
-    System.out.println(expExpans);
+//    System.out.println("=== ExpandedExpansion ===");
+//    AST expExpans = testExpandedExpansion(ast);
+//    System.out.println(expExpans);
 
-    System.out.println("=== ExpandedJava Code ===");
-    String java2 = testJavaTranslator(expExpans);
-    System.out.println(java2);
+//    System.out.println("=== ExpandedJava Code ===");
+//    String java2 = testJavaTranslator(expExpans);
+//    System.out.println(java2);
 
 
     String java3 = testJavaCompiler(ast, buildPath);

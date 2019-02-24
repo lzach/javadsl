@@ -2,6 +2,7 @@ package dsl.tests.expansion;
 
 import dsl.ast.AST;
 import dsl.ast.ASTBuilder;
+import dsl.parser.Token;
 
 import java.util.*;
 
@@ -9,7 +10,9 @@ public class Expansion {
   private AST expansion;
   private final Map<String, AST> expansionMap = new HashMap<>();
   private final Map<String, AST> functionMap = new HashMap<>();
-  private final Map<String, List<String>> params = new HashMap<>();
+  private final Map<String, List<String>> funParams = new HashMap<>();
+  private final Map<String, AST> opMap = new HashMap<>();
+  private final Map<String, List<String>> opParams = new HashMap<>();
   private final Deque<Deque<Map<String, AST>>> symbols = new ArrayDeque<>();
 
   public Expansion(AST expansion) {
@@ -69,14 +72,24 @@ public class Expansion {
     for (AST child : expansion.get("functions").getMemberList()) {
       assert ( Objects.equals(child.getTypeName(), "Function"));
       String type = dereference(child.get("name"));
-      AST ast = child.get("expansion");
-      functionMap.put(type, ast);
+      fillMap(child, type, functionMap, funParams);
+    }
 
-      List<String> pList = new ArrayList<>();
-      params.put(type, pList);
-      for ( AST param : child.get("params").getMemberList() ) {
-        pList.add(dereference(param.get("name")));
-      }
+    for (AST child : expansion.get("operations").getMemberList()) {
+      assert ( Objects.equals(child.getTypeName(), "Operation"));
+      String type = dereference(child.get("name"));
+      fillMap(child, type, opMap, opParams);
+    }
+  }
+
+  private void fillMap(AST child, String type, Map<String, AST> functionMap, Map<String, List<String>> funParams) {
+    AST ast = child.get("expansion");
+    functionMap.put(type, ast);
+
+    List<String> pList = new ArrayList<>();
+    funParams.put(type, pList);
+    for ( AST param : child.get("params").getMemberList() ) {
+      pList.add(dereference(param.get("name")));
     }
   }
 
@@ -94,6 +107,9 @@ public class Expansion {
     assert refAST != null;
     Object o = refAST.getValue();
     assert o != null;
+    if ( o instanceof Token ) {
+      o = ((Token)o).getValue();
+    }
     assert o instanceof String;
     return (String) o;
   }
@@ -179,22 +195,28 @@ public class Expansion {
           builder.set(str);
         }
         break;
-      case "getArgs":
+      case "expand":
+        return replace(replace(ast.get("expansion"), ast), replace(ast.get("ast"), ast));
+      case "getFunArgxs":
         //TODO: return args for given function
-	builder.setName("ArgList");
-	List<String> pList = params.get(ast.getTypeName());
-	AST argAST = lookup("ast");
-	if ( argAST == null && ast.hasMember("ast") ) {
-	  argAST = ast.get("ast");
-	} else if (argAST == null ) {
-      	  argAST = AST.create("IDLit", "ast");
-	}
+        builder.setName("ArgList");
+        List<String> pList = funParams.get(template.getTypeName());
+        AST argAST = null;
+        if ( ast.hasMember("ast") ) {
+          argAST = expand(ast.get("ast"));
+        }
+        if ( argAST == null ) {
+          argAST = lookup("ast");
+        }
+        if (argAST == null ) {
+                argAST = AST.create("IDLit", "ast");
+        }
         builder.add(new AST("Arg", new Object[]{"name", AST.create("IDLit", "ast")}, new Object[]{"value", argAST}));
-	   System.out.println(argAST);
-	for ( String name : pList ) {
-           builder.add(new AST("Arg", new Object[]{"name", AST.create("IDLit", name)}, new Object[]{"value", ast.get(name)}));
-	}
-	return builder.create();
+        System.out.println(argAST);
+        for ( String name : pList ) {
+          builder.add(new AST("Arg", new Object[]{"name", AST.create("IDLit", name)}, new Object[]{"value", ast.get(name)}));
+        }
+        return builder.create();
       case "isMember":
         if ( ast.isMembers() ) {
           return replace(template.get("expansion"), ast);
@@ -223,7 +245,7 @@ public class Expansion {
       case "literalItem":
         return ast;
       case "typeName":
-	return AST.create("IDLit", ast.getTypeName());
+        return AST.create("IDLit", ast.getTypeName());
       case "hasArg":
         assert template.isMembers();
         assert template.hasMember("arg");
@@ -245,6 +267,19 @@ public class Expansion {
             arg = replace(template.get("ast"), ast);
           }
           AST retval = replace(functionMap.get(template.getTypeName()), arg);
+          popStack();
+          return retval;
+        } else if ( opMap.containsKey(template.getTypeName())) {
+          pushStack();
+          // TODO: This should not try to access "args", but rather get all the different members and pass that through somehow.
+          for ( String name: template.getMembers() ) {
+            set(name, template.get(name));
+          }
+          AST arg = ast;
+          if ( template.hasMember("ast") ) {
+            arg = replace(template.get("ast"), ast);
+          }
+          AST retval = replace(opMap.get(template.getTypeName()), arg);
           popStack();
           return retval;
         } else {
