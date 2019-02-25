@@ -9,9 +9,9 @@ public class TypeTranslator implements AstTranslator {
     switch (ast.getTypeName()) {
       case "Type":
         return new AST("Class", new Object[]{"name",    AST.create("String", "Type")},
-                                      new Object[]{"attrs",   AST.create("list", new AST("Attr", new Object[]{"name", AST.create("String", "..")},
+                                      new Object[]{"attrs",   AST.create("emptyList", new AST("Attr", new Object[]{"name", AST.create("String", "..")},
                                                                                                           new Object[]{"value", AST.create("String", "...")}))},
-                                      new Object[]{"methods", AST.create("list", (Object)null)});
+                                      new Object[]{"methods", AST.create("emptyList", (Object)null)});
       case "Relation":
         break;
       case "MemberPairList":

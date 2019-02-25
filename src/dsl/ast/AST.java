@@ -82,6 +82,10 @@ public class AST {
     return create("IDLit", name);
   }
 
+  public static AST emptyList(String listType) {
+    return new AST(listType, new AST[0]);
+  }
+
 
   public String getMemberType() {
     return isMembers() ? "Members" : isList() ? "List" : "Value";
