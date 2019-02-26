@@ -128,9 +128,9 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   public ASTBuilder setName(String name) {
-    if ( this.typeName != null ) {
-      throw new InvalidAstException("Can't set name when typeName is set");
-    }
+//    if ( this.typeName != null ) {
+//      throw new InvalidAstException("Can't set name when typeName is set");
+//    }
     this.typeName = name;
     return this;
   }
