@@ -107,6 +107,9 @@ public class AST {
   public Object getValue() {
     if ( value instanceof Token )
       return ((Token)value).getValue();
+    if ( null == value) {
+      return null;
+    }
     return value;
   }
 

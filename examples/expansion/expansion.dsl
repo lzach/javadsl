@@ -9,7 +9,7 @@
             (Import name:(Name java util ArrayDeque))
             (Import name:(Name dsl ast AST))
             (Import name:(Name dsl ast ASTBuilder))
-            (Class modifier:public name:(concat Expansion (member name:name)) attrs:(AttrList) base:(Name domain2 expansion Expansion)
+            (Class modifier:public name:(concat Expansion (member name:name)) attrs:(AttrList) base:(Name dsl expansion Expansion)
                  attrs: (AttrList
                      (Attr name:funcMap type:Map)
                  )

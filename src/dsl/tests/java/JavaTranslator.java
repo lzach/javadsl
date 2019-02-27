@@ -11,6 +11,9 @@ public class JavaTranslator implements StringTranslator {
 
   public String translate(AST ast, String enforcedType) {
     String str = "";
+    if ( enforcedType == null ) {
+      return "";
+    }
     switch (enforcedType) {
       case "Import":
         str = "import ";
@@ -115,7 +118,7 @@ public class JavaTranslator implements StringTranslator {
         }
         return str + ")" + translate(ast.get("code"));
       case "If":
-        return "if (" + translate(ast.get("cond")) + ")" + translate(ast.get("code"));
+        return "if (" + translate(ast.get("cond")) + ")" + translate(ast.get("code")) + ( ast.hasMember("otherwise") ? " else " + translate(ast.get("otherwise")) : "");
       case "While":
         return "while (" + translate(ast.get("cond")) + ")" + translate(ast.get("code"));
       case "Block":
@@ -136,6 +139,8 @@ public class JavaTranslator implements StringTranslator {
                 str = str.substring(0, str.length() - 1);
         }
         return str;
+      case "Neq":
+        return translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs"));
       case "IDLit":
         return ast.getValue().toString();
       case "String":
