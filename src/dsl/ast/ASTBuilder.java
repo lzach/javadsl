@@ -223,7 +223,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
       } else if (value != null) {
         ast = AST.create(typeName, value);
       } else {
-        ast = new AST(typeName, new AST[]{});
+        ast = AST.emptyList(typeName);
       }
     }
     return ast;
