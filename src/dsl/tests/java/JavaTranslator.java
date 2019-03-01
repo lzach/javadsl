@@ -98,7 +98,7 @@ public class JavaTranslator implements StringTranslator {
         }
         return str;
       case "Convert":
-        return "((" + translate(ast.get("type")) + ")" + translate(ast.get("value")) + ")";
+        return "((" + translate(ast.get("type")) + ")(" + translate(ast.get("value")) + "))";
       case "Select":
         return "switch (" + translate(ast.get("value")) + ") {\n" + translate(ast.get("block")) + "}\n";
       case "Case":

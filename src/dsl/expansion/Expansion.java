@@ -13,6 +13,7 @@ public abstract class Expansion {
 
   public Expansion(AST expansion) {
     this.expansion = expansion;
+    this.pushStack();
   }
 
   public abstract AST expand(AST ast);

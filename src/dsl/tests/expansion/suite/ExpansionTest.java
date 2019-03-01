@@ -57,7 +57,7 @@ public class ExpansionTest {
       e.printStackTrace();
     }
     try {
-      Process pro = Runtime.getRuntime().exec("javac -d " + buildPath + " -cp " + buildPath + " ExpansionExpansion.java");
+      Process pro = Runtime.getRuntime().exec("javac -d " + buildPath + " -g -cp " + buildPath + " ExpansionExpansion.java");
       pro.waitFor();
 
       BufferedReader is = new BufferedReader(new InputStreamReader(pro.getInputStream()));
@@ -72,7 +72,7 @@ public class ExpansionTest {
 
 
       assert pro.exitValue() == 0;
-      Expansion exp = (Expansion)Class.forName("ExpansionExpansion").getConstructor().newInstance();
+      Expansion exp = (Expansion)Class.forName("ExpansionExpansion").getConstructor(AST.class).newInstance(astExp);
       AST newAST = exp.expand(astExp);
       System.out.println("=== Expanded Expanded Expansion ===");
       System.out.println(newAST);
