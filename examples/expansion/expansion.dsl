@@ -14,18 +14,17 @@
                      (Attr name:funcMap type:Map)
                  )
                  cons:(ConsList
-                      (Constructor params:(ParamList) code:(Block
-                          (Assign lhs:funcMap rhs:(New type:HashMap args:(ArgList)))
-                          (members name:functions template:(List
-                             (Call function:(Member lhs:funcMap rhs:put) args:(ArgList
-                                    (Arg name:key value:(String value:(member name:name)))
-                                    (Arg name:value  value:(Call function:(Member lhs:Arrays rhs:asList) args:(members name:params template:(String value:(member name:name)))))
-                             ))
-                          ))
-                       ))
+                      (Constructor params:(ParamList (Param name:ast type:AST)) code:(Block
+                          (Call function:super args:(ArgList (Arg name:ast value:ast)))
+                          (Call function:update args:(ArgList))
+                          (Call function:pushStack args:(ArgList))
+                      ))
                  )
                  methods:(concat
                      (MethodList
+                         (Method name:expand params:(ParamList) returnType:AST code:(Block
+                             (Call function:expand args:(ArgList (Arg name:ast value:ast)))
+                         ))
                          (Method name:expand params:(ParamList (Param name:ast type:AST)) returnType:AST code:(Block
                              (Select value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)) block:(List
                                   (members name:expansions template:(Case value:(String value:(member name:type)) block:(callExpansion ast:(literalItem))))
@@ -101,5 +100,9 @@
      (Operation name:typeName  params:(List) expansion:(List))
      (Operation name:literalItem  params:(List) expansion:ast)
      (Operation name:expandItem  params:(List) expansion:(List))
+  )
+  literals:(LiteralList
+      (Literal name:for params:(ParamList (Param name:pre type:Expr) (Param name:cond type:Expr) (Param name:post type:Expr) (Param name:code type:Block)) expansion:(For init:pre cond:cond post:post code:code))
+
   )
 )

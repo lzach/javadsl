@@ -233,8 +233,8 @@ public class ExpandedExpansion {
 
   private AST expExpansion(AST ast) {
 
-    ASTBuilder astList = new ASTBuilder("List");
-    astList.add(new ASTBuilder("Assign")
+    ASTBuilder builder = new ASTBuilder("List");
+    builder.add(new ASTBuilder("Assign")
                 .add("lhs", AST.create("IDLit", "builder"))
                 .add("rhs", new ASTBuilder("New")
                          .add("type", AST.create("IDLit", "ASTBuilder"))
@@ -247,7 +247,7 @@ public class ExpandedExpansion {
                                                           .create()))
                         .create())
                 .create());
-    astList.add(new ASTBuilder("Call")
+    builder.add(new ASTBuilder("Call")
                   .add("function", new ASTBuilder("Member")
                                 .add("lhs", AST.create("IDLit", "bQue"))
                                 .add("rhs", AST.create("IDLit", "push"))
@@ -296,7 +296,7 @@ public class ExpandedExpansion {
                             .create())
                          .create())
                  .create());
-        astList.add(list.create());
+        builder.add(list.create());
       }
     }
     /* isList */
@@ -323,7 +323,7 @@ public class ExpandedExpansion {
                                                 .add("lhs", AST.create("IDLit", "builder"))
                                                 .add("rhs", AST.create("IDLit", "create")).create())
                                         .add("args", new AST("ArgList", new AST[0])).create()).create()).create()).create());
-        astList.add(list.create());
+        builder.add(list.create());
       }
     }
     /* isValue */
@@ -348,9 +348,9 @@ public class ExpandedExpansion {
                                               .add("lhs", AST.create("IDLit", "builder"))
                                               .add("rhs", AST.create("IDLit", "create")).create())
                                       .add("args", new AST("ArgList", new AST[0])).create()).create()).create()).create());
-      astList.add(list.create());
+      builder.add(list.create());
     }
-    astList.add(new ASTBuilder("Assign")
+    builder.add(new ASTBuilder("Assign")
             .add("lhs", AST.create("IDLit", "builder"))
             .add("rhs", new ASTBuilder("Convert")
                     .add("type", AST.create("IDLit", "ASTBuilder"))
@@ -363,7 +363,7 @@ public class ExpandedExpansion {
                             .create())
                     .create())
             .create());
-    return astList.create();
+    return builder.create();
   }
 
   public AST getArgs(AST ast) {
