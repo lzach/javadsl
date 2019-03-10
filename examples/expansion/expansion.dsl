@@ -26,13 +26,37 @@
                              (Call function:expand args:(ArgList (Arg name:ast value:ast)))
                          ))
                          (Method name:expand params:(ParamList (Param name:ast type:AST)) returnType:AST code:(Block
+                             (varDecls)
                              (Select value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)) block:(List
                                   (members name:expansions template:(Case value:(String value:(member name:type)) block:(callExpansion ast:(literalItem))))
                                   (members name:functions template:(Case value:(String value:(member name:name)) block:(callFunction ast:(literalItem))))
                                   (members name:operations template:(Case value:(String value:(member name:name)) block:(callOperation ast:(literalItem))))
-                                  (Default block:(callPlain ast:(literalItem)))
+                                  (Default block:(callPlain ast:(Block
+                                     (If cond:(isFunction(ast)) code:(Block
+                                        (push value:(Call function:(getName) args:(getArgs)))
+                                     ) otherwise:(If cond:(isOperation(ast)) code:(Block
+                                        (pushLocal)
+                                        (For val:paramName expr:(getMembers) code:(Block
+                                           (define name:paramName value:(member member:paramName))
+                                        ))
+                                        (addMember member:(expand ast:(member member:expansion)))
+                                        (popLocal)
+                                     ) otherwise:(If cond:(isMember(ast)) code:(Block
+                                        (setName name:(getName ast:ast))
+                                        (For val:memberName expr:(getMembers) code:(Block
+                                           (setMember name:memberName member:(member member:memberName))
+                                        ))
+                                     ) otherwise:(If cond:(isList(ast)) code:(Block
+                                        (setName name:(getName ast:ast))
+                                        (For val:memberName expr:(getMembers) code:(Block
+                                           (addMember member:(member member:memberName))
+                                        ))
+                                     ) otherwise:(Block
+                                        (setValue value:(expand ast:(getValue)))
+                                     )))))
+                                  )))
                              ))
-                             (Return value:(Call function:(Member lhs:AST rhs:create) args:(ArgList (Arg name:typeName value:(String value:"")))))
+                             (Return value:(create))
                          ))
                      )
                      (members name:expansions template:(Method name:(expFunName ast:(literalItem)) returnType:AST params:(ParamList (Param name:ast type:AST))
@@ -46,7 +70,9 @@
             (Define type:ASTBuilder name:builder)
             (Define type:Deque name:bQue)
             (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
+
             (member name:expansion template:(dispatch ast:(literalItem)))
+
             (Return value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
       ))
       (Expansion type:Function expansion:(Method name:(member name:name) returnType:AST params:(concat (ParamList (Param name:ast type:AST)) (member name:params)) code:(Block
@@ -100,9 +126,19 @@
      (Operation name:typeName  params:(List) expansion:(List))
      (Operation name:literalItem  params:(List) expansion:ast)
      (Operation name:expandItem  params:(List) expansion:(List))
-  )
-  literals:(LiteralList
-      (Literal name:for params:(ParamList (Param name:pre type:Expr) (Param name:cond type:Expr) (Param name:post type:Expr) (Param name:code type:Block)) expansion:(For init:pre cond:cond post:post code:code))
+
+     (Operation name:varDecls  params:(List) expansion:(List
+         (Define type:ASTBuilder name:builder)
+         (Define type:Deque name:bQue)
+         (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList)))
+         (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
+     ))
+     (Operation name:setName params:(ParamList (Param name:name type:AST)) expansion:
+        (Call function:(Member lhs:builder rhs:setName) args:(ArgList (Arg name:name value:(String value:(ref name:name)))))
+     )
+     (Operation name:create params:(ParamList) expansion:(Call function:(Member lhs:builder rhs:create) args:(ArgList))
+     )
 
   )
+
 )

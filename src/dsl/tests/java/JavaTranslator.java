@@ -66,7 +66,7 @@ public class JavaTranslator implements StringTranslator {
         if ( !ast.isList() ) {
                 return translate(ast);
         }
-        //TODO: here we need to make sure the arguments/params end up in the right order.
+        // TODO: here we need to make sure the arguments/params end up in the right order.
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
             str += translate(child) + ",";
@@ -99,6 +99,8 @@ public class JavaTranslator implements StringTranslator {
         return str;
       case "Convert":
         return "((" + translate(ast.get("type")) + ")(" + translate(ast.get("value")) + "))";
+      case "Index":
+        return "((" + translate(ast.get("lhs")) + ")[" + translate(ast.get("rhs")) + "])";
       case "Select":
         return "switch (" + translate(ast.get("value")) + ") {\n" + translate(ast.get("block")) + "}\n";
       case "Case":
@@ -141,6 +143,8 @@ public class JavaTranslator implements StringTranslator {
         return str;
       case "Neq":
         return translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs"));
+      case "IntLit":
+        return ast.getValue().toString();
       case "IDLit":
         return ast.getValue().toString();
       case "String":

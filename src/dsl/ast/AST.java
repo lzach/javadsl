@@ -86,8 +86,12 @@ public class AST {
     return new AST(listType, new AST[0]);
   }
 
+  public static AST INTLit(int i) {
+    return create("IntLit", i);
+  }
 
-  public String getMemberType() {
+
+    public String getMemberType() {
     return isMembers() ? "Members" : isList() ? "List" : "Value";
   }
 
