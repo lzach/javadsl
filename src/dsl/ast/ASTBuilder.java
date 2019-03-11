@@ -232,4 +232,8 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   public String getTypeName() {
     return typeName;
   }
+
+  public Object getValue() {
+    return value;
+  }
 }

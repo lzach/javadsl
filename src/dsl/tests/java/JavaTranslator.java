@@ -141,8 +141,18 @@ public class JavaTranslator implements StringTranslator {
                 str = str.substring(0, str.length() - 1);
         }
         return str;
+      case "Eq":
+        return "Objects.equals(" + translate(ast.get("lhs")) + ", " + translate(ast.get("rhs")) + ")";
       case "Neq":
         return translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs"));
+      case "Add":
+        return translate(ast.get("lhs")) + "+" + translate(ast.get("rhs"));
+      case "Sub":
+        return translate(ast.get("lhs")) + "-" + translate(ast.get("rhs"));
+      case "Mul":
+        return translate(ast.get("lhs")) + "*" + translate(ast.get("rhs"));
+      case "Div":
+        return translate(ast.get("lhs")) + "/" + translate(ast.get("rhs"));
       case "IntLit":
         return ast.getValue().toString();
       case "IDLit":
