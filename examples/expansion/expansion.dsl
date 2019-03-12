@@ -37,19 +37,19 @@
                                      ) otherwise:(If cond:(isOperation(ast)) code:(Block
                                         (pushLocal)
                                         (For val:paramName expr:(getMembers) code:(Block
-                                           (define name:paramName value:(member member:paramName))
+                                           (define name:paramName value:(member name:paramName))
                                         ))
-                                        (addMember member:(expand ast:(member member:expansion)))
+                                        (addMember member:(expand ast:(member name:expansion)))
                                         (popLocal)
                                      ) otherwise:(If cond:(isMember(ast)) code:(Block
                                         (setName name:(getName ast:ast))
                                         (For val:memberName expr:(getMembers) code:(Block
-                                           (setMember name:memberName member:(member member:memberName))
+                                           (setMember name:memberName member:(member name:memberName))
                                         ))
                                      ) otherwise:(If cond:(isList(ast)) code:(Block
                                         (setName name:(getName ast:ast))
                                         (For val:memberName expr:(getMembers) code:(Block
-                                           (addMember member:(member member:memberName))
+                                           (addMember member:(member name:memberName))
                                         ))
                                      ) otherwise:(Block
                                         (setValue value:(expand ast:(getValue)))
