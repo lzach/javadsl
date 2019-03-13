@@ -10,8 +10,8 @@ public abstract class Expansion {
   protected final Map<String, List<String>> functionMap = new HashMap<>();
   protected final Map<String, List<String>> opParams = new HashMap<>();
   protected final Map<String, AST> opMap = new HashMap<>();
-  protected final Map<String, List<String>> literalParams = new HashMap<>();
-  protected final Map<String, AST> literalMap = new HashMap<>();
+
+  protected final Deque<AST> asts = new ArrayDeque<>();
 
   protected final Deque<Deque<Map<String, AST>>> symbols = new ArrayDeque<>();
 
@@ -64,6 +64,18 @@ public abstract class Expansion {
     pushLocal();
   }
 
+  protected void pushAST(AST ast) {
+    asts.push(ast);
+  }
+
+  protected AST popAST() {
+    return asts.pop();
+  }
+
+  protected AST peekAST() {
+    return asts.peek();
+  }
+
   protected void popStack() {
     symbols.pop();
   }
@@ -76,7 +88,7 @@ public abstract class Expansion {
     symbols.peek().pop();
   }
 
-  protected AST lookup(String name) {
+  protected AST get(String name) {
     for ( Map<String, AST> map : symbols.peek() ) {
       if ( map.containsKey(name)) {
         return map.get(name);

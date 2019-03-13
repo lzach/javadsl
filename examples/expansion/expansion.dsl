@@ -37,7 +37,7 @@
                                      ) otherwise:(If cond:(isOperation(ast)) code:(Block
                                         (pushLocal)
                                         (For val:paramName expr:(getMembers) code:(Block
-                                           (define name:paramName value:(member name:paramName))
+                                           (define name:(ref name:paramName) value:(member name:paramName))
                                         ))
                                         (addMember member:(expand ast:(member name:expansion)))
                                         (popLocal)
