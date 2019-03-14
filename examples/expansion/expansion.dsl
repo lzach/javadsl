@@ -36,15 +36,13 @@
                                         (push value:(Call function:(getName) args:(getArgs)))
                                      ) otherwise:(If cond:(isOperation(ast)) code:(Block
                                         (pushLocal)
-                                        (For val:(Define name:paramName type:AST) expr:(getMembers) code:(Block
-                                           (define name:(ref name:paramName) value:(member name:(ref name:paramName)))
-                                        ))
-                                        (addMember member:(expand ast:(member name:expansion)))
+
+                                        (addMember member:(expand ast:(member name:expansions)))
                                         (popLocal)
                                      ) otherwise:(If cond:(isMember(ast)) code:(Block
                                         (setName name:(getName ))
                                         (For val:(Define name:memberName type:String) expr:(getMembers) code:(Block
-                                           (setMember name:(ref name:memberName) member:(member name:(ref name:memberName)))
+                                           (setMember name:(ref name:memberName) member:(getMember member:(ref name:memberName)))
                                         ))
                                      ) otherwise:(If cond:(isList(ast)) code:(Block
                                         (setName name:(getName ))
@@ -57,14 +55,14 @@
                                   )))
                              )
                              (Return value:(create))
-                         )
+                         ))
                      )
                      (members name:expansions template:(Method name:(expFunName ) returnType:AST params:(ParamList (Param name:ast type:AST))
                         code:(expandItem)
                      ))
                      (members name:functions template:(expandItem))
                  )
-            ))
+            )
       ))
       (Expansion type:Expansion expansion:(Block
             (Define type:ASTBuilder name:builder)
@@ -105,7 +103,10 @@
              ) otherwise:(expExpansion )
           )
       ))
-      (Function name:getFunArgs params:(ParamList ) expansion:(concat (ArgList (Arg name:ast value:ast)) (member name:params template:(members template:(Arg name:(itemKey) value:(literalValue))))))
+      (Function name:getFunArgs params:(ParamList ) expansion:(concat
+          (ArgList (Arg name:ast value:ast))
+          (member name:params template:(ArgList (members template:(Arg name:(itemKey) value:(literalValue)))))
+      ))
   )
   operations:(OpList
      (Operation name:callExpansion params:(ParamList ) expansion:
@@ -113,7 +114,7 @@
      (Operation name:callFunction params:(ParamList ) expansion:
             (Return value:(Call function:(member name:name) args:(getFunArgs ))))
      (Operation name:callOperation params:(ParamList ) expansion:
-            (expand    template:(member name:expansion template:(expandItem))))
+            (Call function:expand args:(ArgList (Arg name:ast value:(member name:expansion template:(expandItem))))))
      (Operation name:isMember params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isList params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isValue params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
