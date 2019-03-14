@@ -58,9 +58,9 @@
                          ))
                      )
                      (members name:expansions template:(Method name:(expFunName ) returnType:AST params:(ParamList (Param name:ast type:AST))
-                        code:(expandItem)
+                        code:ast
                      ))
-                     (members name:functions template:(expandItem))
+                     (members name:functions template:(member name:expansion))
                  )
             )
       ))
@@ -114,7 +114,7 @@
      (Operation name:callFunction params:(ParamList ) expansion:
             (Return value:(Call function:(member name:name) args:(getFunArgs ))))
      (Operation name:callOperation params:(ParamList ) expansion:
-            (Call function:expand args:(ArgList (Arg name:ast value:(member name:expansion template:(expandItem))))))
+            (Call function:expand args:(ArgList (Arg name:ast value:(member name:expansion)))))
      (Operation name:isMember params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isList params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isValue params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
@@ -126,7 +126,6 @@
      (Operation name:itemKey  params:(List) expansion:(List))
      (Operation name:typeName  params:(List) expansion:(List))
      (Operation name:literalItem  params:(List) expansion:ast)
-     (Operation name:expandItem  params:(List) expansion:(List))
 
      (Operation name:varDecls  params:(List) expansion:(List
          (Define type:ASTBuilder name:builder)

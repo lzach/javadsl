@@ -164,6 +164,8 @@ public class JavaTranslator implements StringTranslator {
         return "\"" + ast.getValue() + "\"";
       case "ID":
         return ast.getValue().toString();
+      case "Comment":
+        return "/* " +ast.getMemberList()[0].getToken() + ": " + ast.getMemberList()[0] + " */";
 
     }
     return "";

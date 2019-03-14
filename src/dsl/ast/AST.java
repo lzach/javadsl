@@ -301,4 +301,8 @@ public class AST {
   Map<String, AST> getMemberMap() {
     return members;
   }
+
+  public Token getToken() {
+    return fromToken;
+  }
 }
