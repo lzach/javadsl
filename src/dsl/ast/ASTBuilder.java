@@ -113,12 +113,22 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
     }
     return this;
   }
+
   @Override
   public ASTListBuilder addAll(Collection<AST> asts) {
     if ( memberList == null ) {
       createMemberList();
     }
     memberList.addAll(asts);
+    return this;
+  }
+
+  @Override
+  public ASTListBuilder addAll(AST ... asts) {
+    if ( memberList == null ) {
+      createMemberList();
+    }
+    memberList.addAll(Arrays.asList(asts));
     return this;
   }
 
