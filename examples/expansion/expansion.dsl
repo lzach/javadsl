@@ -10,9 +10,7 @@
             (Import name:(Name dsl ast AST))
             (Import name:(Name dsl ast ASTBuilder))
             (Class modifier:public name:(concat Expansion (member name:name)) attrs:(AttrList) base:(Name dsl expansion Expansion)
-                 attrs: (AttrList
-                     (Attr name:funcMap type:Map)
-                 )
+                 attrs: (AttrList)
                  cons:(ConsList
                       (Constructor params:(ParamList (Param name:ast type:AST)) code:(Block
                           (Call function:super args:(ArgList (Arg name:ast value:ast)))
@@ -36,17 +34,16 @@
                                         (push value:(Call function:(getName) args:(getArgs)))
                                      ) otherwise:(If cond:(isOperation(ast)) code:(Block
                                         (pushLocal)
-
                                         (addMember member:(expand ast:(member name:expansions)))
                                         (popLocal)
                                      ) otherwise:(If cond:(isMember(ast)) code:(Block
                                         (setName name:(getName ))
-                                        (For val:(Define name:memberName type:String) expr:(getMembers) code:(Block
+                                        (For var:(Define name:memberName type:String) expr:(getMembers) code:(Block
                                            (setMember name:(ref name:memberName) member:(getMember member:(ref name:memberName)))
                                         ))
                                      ) otherwise:(If cond:(isList(ast)) code:(Block
                                         (setName name:(getName ))
-                                        (For val:(Define name:memberAST type:AST) expr:(getMembers) code:(Block
+                                        (For var:(Define name:memberAST type:AST) expr:(getMembers) code:(Block
                                            (addMember member:(ref name:memberAST)))
                                         )
                                      )) otherwise:(Block
@@ -58,7 +55,7 @@
                          ))
                      )
                      (members name:expansions template:(Method name:(expFunName ) returnType:AST params:(ParamList (Param name:ast type:AST))
-                        code:ast
+                        code:(Block )
                      ))
                      (members name:functions template:(member name:expansion))
                  )
@@ -105,7 +102,7 @@
       ))
       (Function name:getFunArgs params:(ParamList ) expansion:(concat
           (ArgList (Arg name:ast value:ast))
-          (member name:params template:(ArgList (members template:(Arg name:(itemKey) value:(literalValue)))))
+          (member name:params template:(members template:(Arg name:(itemKey) value:(literalValue))))
       ))
   )
   operations:(OpList
@@ -118,8 +115,8 @@
      (Operation name:isMember params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isList params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
      (Operation name:isValue params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
-     (Operation name:isFunction params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
-     (Operation name:isOperation params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(members template:(List)))
+     (Operation name:isFunction params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(Call function:(Member lhs:functionMap rhs:containsKey) args:(ArgList (Arg name:key value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList))))))
+     (Operation name:isOperation params:(ParamList (Param type:AST name:expansion) (Param type:AST name:otherwise)) expansion:(Call function:(Member lhs:opParams rhs:containsKey) args:(ArgList (Arg name:key value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList))))))
      (Operation name:member  params:(List) expansion:(List))
      (Operation name:members params:(List) expansion:(List))
      (Operation name:concat  params:(List) expansion:(List))

@@ -31,7 +31,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
     this.typeName = ast.getTypeName();
     this.members = ast.getMemberMap();
     if ( ast.getMemberList() != null ) {
-      this.memberList = Arrays.asList(ast.getMemberList());
+      this.memberList = new ArrayList<>(Arrays.asList(ast.getMemberList()));
     }
     this.value = ast.getValue();
 
@@ -45,7 +45,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   public ASTBuilder(String typeName, AST... memberList) {
     this.typeName = typeName;
     if ( memberList.length != 0) {
-      this.memberList = Arrays.asList(memberList);
+      this.memberList = new ArrayList<>(Arrays.asList(memberList));
     }
   }
 
@@ -71,7 +71,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
     if ( memberList.length == 1 && memberList[0] == null ) {
       this.memberList = new ArrayList<>();
     } else {
-      this.memberList = Arrays.asList(memberList);
+      this.memberList = new ArrayList<>(Arrays.asList(memberList));
     }
   }
   public ASTBuilder(List<AST>  memberList) {
