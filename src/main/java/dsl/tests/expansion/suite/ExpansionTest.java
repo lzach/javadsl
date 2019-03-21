@@ -2,8 +2,10 @@ package dsl.tests.expansion.suite;
 
 import dsl.ast.AST;
 import dsl.expansion.Expansion;
+import dsl.expansion.impl.ExpandedExpansion;
+import dsl.expansion.impl.ExpandedSwitchExpansion;
 import dsl.parser.Parser;
-import dsl.tests.java.JavaTranslator;
+import dsl.translators.impl.JavaTranslator;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -31,12 +33,12 @@ public class ExpansionTest {
   }
 
   private static AST testExpansion(AST expansion, AST def) {
-    AST exp = new dsl.tests.expansion.Expansion(expansion).expand(def);
+    AST exp = new dsl.expansion.impl.Expansion(expansion).expand(def);
     assert exp != null;
     return exp;
   }
   private static AST testExpandedExpansion(AST def) {
-    AST exp = new dsl.tests.expansion.ExpandedExpansion(def).expand();
+    AST exp = new ExpandedExpansion(def).expand();
     assert exp != null;
     return exp;
   }
@@ -102,7 +104,7 @@ public class ExpansionTest {
   }
 
   private static AST testExpandedSwitchExpansion(AST def) {
-    AST exp = new dsl.tests.expansion.ExpandedSwitchExpansion(def).expand();
+    AST exp = new ExpandedSwitchExpansion(def).expand();
     assert exp != null;
     return exp;
   }

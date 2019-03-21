@@ -2,8 +2,8 @@ package dsl.tests;
 
 import dsl.ast.AST;
 import dsl.parser.Parser;
-import dsl.tests.expansion.Expansion;
-import dsl.tests.java.JavaTranslator;
+import dsl.expansion.impl.Expansion;
+import dsl.translators.impl.JavaTranslator;
 
 import java.io.FileNotFoundException;
 import java.util.Objects;
