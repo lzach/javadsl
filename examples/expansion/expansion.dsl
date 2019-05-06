@@ -2,10 +2,10 @@
   name:Expansion
   expansions:(ExpansionList
       (Expansion type:Expansions expansion:(List
-            (Import name:(Name java util Deque))
             (Import name:(Name java util Arrays))
             (Import name:(Name java util Map))
             (Import name:(Name java util HashMap))
+            (Import name:(Name java util Deque))
             (Import name:(Name java util ArrayDeque))
             (Import name:(Name dsl ast AST))
             (Import name:(Name dsl ast ASTBuilder))
