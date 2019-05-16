@@ -671,7 +671,9 @@ public class ExpandedSwitchExpansion extends Expansion {
 
         break;
       case "setValue":
-        builder = createBuilder("List");
+        builder = (ASTBuilder) new ASTBuilder("List")
+            .add(createBuilder("List").create())
+            .add(createPush().create());
         break;
       case "itemKey":
 
@@ -687,6 +689,9 @@ public class ExpandedSwitchExpansion extends Expansion {
         break;
       case "setName":
 
+        builder = (ASTBuilder) new ASTBuilder("List")
+            .add(createBuilder("List").create())
+            .add(createPush().create());
         break;
       case "push":
         builder = createPush();
