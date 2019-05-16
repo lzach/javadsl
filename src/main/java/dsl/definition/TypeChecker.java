@@ -1,4 +1,4 @@
-package dsl.composition;
+package dsl.definition;
 
 import dsl.ast.AST;
 

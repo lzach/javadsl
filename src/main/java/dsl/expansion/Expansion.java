@@ -7,12 +7,7 @@ import java.util.*;
 public abstract class Expansion {
   protected AST expansion;
   protected final List<String> expansionList = new ArrayList<>();
-  protected final Map<String, List<String>> functionMap = new HashMap<>();
-  protected final Map<String, List<String>> opParams = new HashMap<>();
-  protected final Map<String, AST> opMap = new HashMap<>();
-
   protected final Deque<AST> asts = new ArrayDeque<>();
-
   protected final Deque<Deque<Map<String, AST>>> symbols = new ArrayDeque<>();
 
   public Expansion(AST expansion) {
@@ -29,33 +24,6 @@ public abstract class Expansion {
       assert (Objects.equals(child.getTypeName(), "Expansion"));
       String type = dereference(child.get("type"));
       expansionList.add(type);
-    }
-
-    for (AST child : expansion.get("functions").getMemberList()) {
-      assert (Objects.equals(child.getTypeName(), "Function"));
-      String type = dereference(child.get("name"));
-
-      setParams(child, type, functionMap);
-    }
-
-    for (AST child : expansion.get("operations").getMemberList()) {
-      assert (Objects.equals(child.getTypeName(), "Operation"));
-      extractMethods(child, opMap, opParams);
-    }
-
-  }
-
-  private void extractMethods(AST child, Map<String, AST> literalMap, Map<String, List<String>> literalParams) {
-    String type = dereference(child.get("name"));
-    literalMap.put(type, child.get("expansion"));
-    setParams(child, type, literalParams);
-  }
-
-  protected void setParams(AST child, String type, Map<String, List<String>> opMap) {
-    List<String> pList = new ArrayList<>();
-    opMap.put(type, pList);
-    for (AST param : child.get("params").getMemberList()) {
-      pList.add(dereference(param.get("name")));
     }
   }
 
@@ -117,7 +85,6 @@ public abstract class Expansion {
     assert nameLit != null;
     //AST refAST = nameLit.get("reference");
     AST refAST = nameLit;
-    assert refAST != null;
     Object o = refAST.getValue();
     assert o != null;
     assert o instanceof String;

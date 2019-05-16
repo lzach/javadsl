@@ -5,7 +5,7 @@ import dsl.ast.AST;
 
 public class TypeTranslation {
   public static void main(String[] args) {
-    Context ctx = dsl.definitions.Type.getContext();
+    Context ctx = dsl.definition.Type.getContext();
 
     AST ast1 = new AST("MemberPair", new String[]{"name", "String"}, new String[]{"type", "Type"});
 //    AST ast2 = new AST("MemberPairList", "ParamPair");

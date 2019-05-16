@@ -1,4 +1,4 @@
-package dsl.composition;
+package dsl.definition;
 
 import java.util.ArrayList;
 import java.util.HashMap;

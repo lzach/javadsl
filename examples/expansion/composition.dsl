@@ -9,19 +9,15 @@
                                             (Import name:(Name java util ArrayDeque))
                                             (Import name:(Name dsl ast AST))
                                             (Import name:(Name dsl ast ASTBuilder))
-                                            (Class modifier:public name:Compostion attrs:(AttrList) base:(Name dsl composition Composition)
+                                            (Class modifier:public name:Composition attrs:(AttrList) base:(Name dsl composition Composer)
                                                  attrs: (AttrList)
                                                  cons:(ConsList)
                                                  methods:(concat
                                                      (MethodList
-                                                         (Method name:compose params:(ParamList) returnType:AST code:(Block
-
+                                                         (Method name:compose params:(ParamList) returnType:Language code:(Block
+                                                            (members template:(expand))
                                                          ))
                                                      )
-                                                     (members name:expansions template:(Method name:(expFunName ) returnType:AST params:(ParamList (Param name:ast type:AST))
-                                                        code:(Block )
-                                                     ))
-                                                     (members name:functions template:(member name:expansion))
                                                  )
                                             )
                                       ))

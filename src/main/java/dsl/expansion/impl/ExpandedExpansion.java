@@ -81,21 +81,21 @@ public class ExpandedExpansion extends Expansion {
 
     /* members name:functions */
     ASTBuilder functions = new ASTBuilder("List");
-    for ( AST fun : ast.get("functions").getMemberList() ) {
-      /* members name:params */
-      ASTBuilder funParams = new ASTBuilder("ArgList");
-      for ( AST funParam : fun.get("params").getMemberList() ) {
-        funParams.add(new AST("String", new Object[]{"value", /* member */funParam.get("name")}));
-      }
-      functions.add(new AST("Call", new Object[]{"function", new AST("Member", new Object[]{"lhs", AST.create("IDLit", "funcMap")}, new Object[]{"rhs", AST.create("IDLit", "put")})},
-                                          new Object[]{"args", new AST("ArgList", new AST("Arg", new Object[]{"name", AST.create("IDLit", "key")}, new Object[]{"value", new AST("String", new Object[]{"value", /*member*/fun.get("name")})}),
-                                                                                        new AST("Arg", new Object[]{"name", AST.create("IDLit", "value")}, new Object[]{"value",
-                                                                                                                                  new AST("Call",
-                                                                                                                                      new Object[]{"function",
-                                                                                                                                       new AST("Member", new Object[]{"lhs", AST.create("IDLit", "Arrays")},
-                                                                                                                                                               new Object[]{"rhs", AST.create("IDLit", "asList")})
-                                                                                                                                      }, new Object[]{"args", funParams.create()})}))}));
-    }
+//    for ( AST fun : ast.get("functions").getMemberList() ) {
+//      /* members name:params */
+//      ASTBuilder funParams = new ASTBuilder("ArgList");
+//      for ( AST funParam : fun.get("params").getMemberList() ) {
+//        funParams.add(new AST("String", new Object[]{"value", /* member */funParam.get("name")}));
+//      }
+//      functions.add(new AST("Call", new Object[]{"function", new AST("Member", new Object[]{"lhs", AST.create("IDLit", "funcMap")}, new Object[]{"rhs", AST.create("IDLit", "put")})},
+//                                          new Object[]{"args", new AST("ArgList", new AST("Arg", new Object[]{"name", AST.create("IDLit", "key")}, new Object[]{"value", new AST("String", new Object[]{"value", /*member*/fun.get("name")})}),
+//                                                                                        new AST("Arg", new Object[]{"name", AST.create("IDLit", "value")}, new Object[]{"value",
+//                                                                                                                                  new AST("Call",
+//                                                                                                                                      new Object[]{"function",
+//                                                                                                                                       new AST("Member", new Object[]{"lhs", AST.create("IDLit", "Arrays")},
+//                                                                                                                                                               new Object[]{"rhs", AST.create("IDLit", "asList")})
+//                                                                                                                                      }, new Object[]{"args", funParams.create()})}))}));
+//    }
     clsAST.add("cons", new ASTBuilder("ConsList").add(new AST("Constructor",
                     new Object[]{"params", new AST("ParamList", new AST[0])},
                     new Object[]{"code", new ASTBuilder("Block").add(
@@ -127,10 +127,7 @@ public class ExpandedExpansion extends Expansion {
           new AST("Param", new Object[]{"name", AST.create("IDLit", "ast")}, new Object[]{"type", AST.create("IDLit", "AST")}))},
           new Object[]{"code", expandExpansion(fMeth)}));
     }
-    /* members name:functions */
-    for ( AST fMeth : ast.get("functions").getMemberList() ) {
-      methodList.add(expandFunction(fMeth));
-    }
+
 
     clsAST.add("methods", methodList.create());
     listAST.add(clsAST.create());

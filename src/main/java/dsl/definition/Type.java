@@ -1,4 +1,4 @@
-package dsl.definitions;
+package dsl.definition;
 
 import dsl.Context;
 
