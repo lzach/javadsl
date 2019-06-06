@@ -7,6 +7,7 @@
             (Import name:(Name java util HashMap))
             (Import name:(Name java util Deque))
             (Import name:(Name java util ArrayDeque))
+            (Import name:(Name java util Collections))
             (Import name:(Name dsl ast AST))
             (Import name:(Name dsl ast ASTBuilder))
             (Class modifier:public name:(concat Expansion (member name:name)) attrs:(AttrList) base:(Name dsl expansion Expansion)
@@ -15,59 +16,123 @@
                       (Constructor params:(ParamList (Param name:ast type:AST)) code:(Block
                           (Call function:super args:(ArgList (Arg name:ast value:ast)))
                           (Call function:update args:(ArgList))
-                          (Call function:pushStack args:(ArgList))
                       ))
                  )
                  methods:(concat
                      (MethodList
                          (Method name:expand params:(ParamList) returnType:AST code:(Block
-                             (Call function:expand args:(ArgList (Arg name:ast value:ast)))
+                            (Return value:(Call function:expand args:(ArgList (Arg name:ast value:expansion))))
                          ))
                          (Method name:expand params:(ParamList (Param name:ast type:AST)) returnType:AST code:(Block
-                             (varDecls)
+                             (Define type:ASTBuilder name:builder)
+                             (Define type:Deque name:bQue)
+                             (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList)))
+                             (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
                              (Select value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)) block:(List
-                                  (members name:expansions template:(Case value:(String value:(member name:type)) block:(callExpansion type:(member name:type))))
+                                  (members name:expansions template:(Case value:(String value:(member name:type)) block:(Return value:(Call function:(expFunName type:(member name:type)) args:(ArgList (Arg name:ast2 value:ast))))))
                                   (Default block:(Block
+                                     (Call function:(Member lhs:builder rhs:setName) args:(ArgList
+                                        (Arg name:name value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)))
+                                     ))
                                      (If cond:(isMember) code:(Block
-                                        (setName name:(getName))
-                                        (For var:(Define name:memberName type:String) expr:(getMembers) code:(Block
-                                           (setMember name:(ref name:memberName) member:(getMember member:(ref name:memberName)))
+                                        (Call function:(Member lhs:builder rhs:setName) args:(ArgList
+                                                                            (Arg name:name value:"List")
+                                                                        ))
+                                        (Assign lhs:(Define type:List name:names) rhs:(New type:ArrayList args:(ArgList)))
+
+                                        (For var:(Define name:memberName type:String) expr:(Call function:(Member lhs:ast rhs:getMembers) args:(ArgList)) code:(Block
+                                           (Assign lhs:(Define type:AST name:child) rhs:(Call function:expand args:(ArgList (Arg name:ast value:(Call function:(Member lhs:ast rhs:get) args:(ArgList (Arg name:name value:memberName)))))))
+                                           (If cond:(Neq lhs:child rhs:null) code:(Block
+                                                (Call function:(Member lhs:names rhs:add) args:(ArgList (Arg name:value value:memberName)))
+                                                (Call function:(Member lhs:bQue rhs:push) args:(ArgList (Arg name:value value:child)))
+                                           ))
                                         ))
-                                     ) otherwise:(If cond:(isList) code:(Block
-                                        (setName name:(getName ))
-                                        (For var:(Define name:memberAST type:AST) expr:(getMembers) code:(Block
-                                           (addMember member:(ref name:memberAST)))
-                                        )
+                                        (Call function:(Member lhs:Collections rhs:reverse) args:(ArgList (Arg name:lst value:names)))
+
+                                        (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:type value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList))))))
+                                        (For var:(Define name:memberName type:String) expr:name code:(Block
+                                             (Call function:(Member lhs:builder rhs:add) args:(ArgList
+                                                 (Arg name:name value:memberName)
+                                                 (Arg name:value value:(pop))
+                                             ))
+                                        ))
+                                        (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
                                      ) otherwise:(Block
-                                        (setValue value:(expand ast:(getValue)))
-                                     )))))
+                                         (If cond:(isList) code:(Block
+                                            (Call function:(Member lhs:builder rhs:setName) args:(ArgList (Arg name:name value:List)))
+                                            (Assign lhs:(Define type:List name:asts) rhs:(New type:ArrayList args:(ArgList)))
+
+                                            (For var:(Define name:child type:AST) expr:(Call function:(Member lhs:ast rhs:getMemberList) args:(ArgList)) code:(Block
+                                               (Assign lhs:child rhs:(Call function:expand args:(ArgList (Arg name:ast value:child))))
+                                               (If cond:(Neq lhs:child rhs:null) code:(Block
+                                                    (Call function:(Member lhs:asts rhs:add) args:(ArgList (Arg name:value value:child)))
+                                               ))
+                                            ))
+                                            (Call function:(Member lhs:Collections rhs:reverse) args:(ArgList (Arg name:lst value:asts)))
+                                            (For var:(Define name:child type:AST) expr:asts code:(Block
+                                                (Call function:(Member lhs:bQue rhs:push) args:(ArgList (Arg name:value value:child)))
+                                            ))
+                                            (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:type value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList))))))
+                                            (For var:(Define name:memberName type:String) expr:names code:(Block
+                                                 (Call function:(Member lhs:builder rhs:add) args:(ArgList
+                                                     (Arg name:value value:(pop))
+                                                 ))
+                                                 (ast name:Call members:(List
+                                                       (Arg name:function value:(ast name:Member members:(List
+                                                               (Arg name:lhs value:builder)
+                                                               (Arg name:rhs value:add)
+                                                       )))
+                                                       (Arg name:args value:(ast name:ArgList list:(List
+                                                           (Arg name:arg value:(ast name:Arg members:(List
+                                                                (Arg name:name value:value)
+                                                                (Arg name:value value:name)
+                                                           )))
+                                                           (Arg name:arg value:(Convert type:AST value:
+                                                              (Call function:(Member lhs:bQue rhs:pop) args:(ArgList))
+                                                           ))
+                                                       )))
+                                                 ))
+                                            ))
+                                            (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
+                                         ) otherwise:(Block
+                                            (Call function:(Member lhs:builder rhs:setName) args:(ArgList
+                                                (Arg name:value value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)))
+                                            ))
+                                            (Call function:(Member lhs:builder rhs:set) args:(ArgList
+                                                (Arg name:value value:(Call function:(Member lhs:ast rhs:getValue) args:(ArgList)))
+                                            ))
+                                            (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
+                                     ))))
                                   ))
-                             (Return value:(create)))
+
+                             ))
+                             (Return value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
+                         )
                      ))
                      (members name:expansions template:(Method name:(expFunName type:(member name:type) ) returnType:AST params:(ParamList (Param name:ast type:AST))
-                        code:(Block )
+                        code:(Block
+                             (Define type:ASTBuilder name:builder)
+                             (Define type:Deque name:bQue)
+                             (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList)))
+                             (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
+                             (member name:expansion)
+                             (Return value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
+                        )
                      ))
                  )
             )
       ))
-      (Expansion type:Expansion expansion:(Block
-            (Define type:ASTBuilder name:builder)
-            (Define type:Deque name:bQue)
-            (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
-            (member name:expansion template:(expand))
-            (Return value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
-      ))
+      (Expansion type:Expansion expansion:(List))
       (Expansion type:member expansion:(List
                  (If cond:(hasMember name:template) code:(Block
                      (ast name:Assign members:(List
                          (Arg name:lhs value:ast)
-                         (Arg name:rhs value:(ast name:(Call members:(List
+                         (Arg name:rhs value:(ast name:Call members:(List
                              (Arg name:function value:(ast name:Member members:(List
                                   (Arg name:lhs value:ast)
                                   (Arg name:rhs value:get)
                              )))
-                             (Arg name:args value:(ast name:ArgList args:(List
-                                 (comment "solve this...")
+                             (Arg name:args value:(ast name:ArgList list:(List
                                  (Arg name:first value:(ast name:Arg members:(List
                                     (Arg name:name value:name)
                                     (Arg name:value value:(ast name:Call members:(List
@@ -75,11 +140,11 @@
                                            (Arg name:lhs value:(pop))
                                            (Arg name:rhs value:toString)
                                         )))
-                                        (Arg name:args value:(ast name:ArgList members:(List)))
+                                        (Arg name:args value:(ast name:ArgList list:(List)))
                                     )))
                                  )))
                              )))
-                         ))))
+                         )))
                      ))
                  ) otherwise:(Block
 
@@ -88,38 +153,35 @@
       (Expansion type:members expansion:(List))
       (Expansion type:concat expansion:(List))
       (Expansion type:ast expansion:(List
-            (comment "The below command needs to be reversed :/")
+            (Comment "The below command needs to be reversed :/")
             (members name:members template:(List
-               (push value:(expand expr:(member name:value)))
+               (push value:(member name:value))
             ))
-            (newBuilder)
+            (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:type value:(typeName)))))
             (members name:members template:
                   (Call function:(Member lhs:builder rhs:add) args:(ArgList
                           (Arg name:name value:(member name:name))
-                          (Arg name:value value:(member name:(pop)))
+                          (Arg name:value value:(pop))
                   ))
             )
-            (push value:(create))
+            (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
       ))
 
-      (Expansion type:callExpansion expansion:
-              (Return value:(Call function:(expFunName type:(member name:type)) args:(ArgList (Arg name:ast value:ast)))))
       (Expansion type:isMember expansion:(members template:(List)))
       (Expansion type:isList expansion:(members template:(List)))
       (Expansion type:isValue expansion:(members template:(List)))
-      (Expansion type:itemKey expansion:(List))
-      (Expansion type:typeName expansion:(List))
-      (Expansion type:literalItem expansion:ast)
-      (Expansion type:varDecls expansion:(List
-           (Define type:ASTBuilder name:builder)
-           (Define type:Deque name:bQue)
-           (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList)))
-           (Assign lhs:bQue rhs:(New type:ArrayDeque args:(ArgList)))
-      ))
-      (Expansion type:setName expansion:
-          (Call function:(Member lhs:builder rhs:setName) args:(ArgList (Arg name:name value:(String value:(ref name:name)))))
-      )
-      (Expansion type:push expansion:ast)
+      (Expansion type:push expansion:(ast name:Convert members:(List
+           (Arg name:type value:AST)
+           (Arg name:value value:(ast name:Call members:(List
+              (Arg name:function value:(ast name:Member members:(List
+                 (Arg name:lhs value:bQue)
+                 (Arg name:rhs value:push)
+              )))
+              (Arg name:args value:(ast name:ArgList members:(List
+                  (Arg name:type value:(member name:value))
+              )))
+           )))
+      )))
       (Expansion type:pop expansion:(ast name:Convert members:(List
           (Arg name:type value:AST)
           (Arg name:value value:(ast name:Call members:(List
@@ -130,25 +192,6 @@
              (Arg name:args value:(ast name:ArgList members:(List)))
           )))
       )))
-      (Expansion type:newBuilder expansion:(Assign lhs:builder lhs:(New type:ASTBuilder args:(ArgList (Arg name:type value:(typeName))))))
-      (Expansion type:create expansion:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
       (Expansion type:expFunName expansion:(concat expand (member name:type)))
-      (Expansion type:expExpansion expansion:(List
-             (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:name value:(String value:(typeName))))))
-             (Call function:(Member lhs:bQue rhs:push) args:builder)
-             (isMember expansion:(members template:(List
-                      (dispatch )
-                      (Call function:(Member lhs:(Convert type:ASTBuilder value:(Call function:(Member lhs:bQue rhs:peek) args:(ArgList))) rhs:add) args:(ArgList (Arg name:name value:(String value:(itemKey))) (Arg name:value value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))))
-             )))
-             (isList expansion:(members template:(List
-                      (dispatch )
-                      (Call function:(Member lhs:(Convert type:ASTBuilder value:(Call function:(Member lhs:bQue rhs:peek) args:(ArgList))) rhs:add) args:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
-             )))
-             (isValue expansion:(Call function:(Member lhs:(Convert type:ASTBuilder value:(Call function:(Member lhs:bQue rhs:peek) args:(ArgList))) rhs:set) args:(String value:ast)))
-             (Assign lhs:builder rhs:(Convert type:ASTBuilder value:(Call function:(Member lhs:bQue rhs:pop) args:(ArgList))))
-      ))
-      (Expansion type:expand expansion:(List
-          (expExpansion)
-      ))
   )
 )

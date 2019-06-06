@@ -50,12 +50,11 @@ public class TestExpansionExpansion  {
   public void testCompile(RepetitionInfo repetitionInfo) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException, ClassNotFoundException {
 
     String outputClass = "ExpansionExpansion" ;
-    String outputName = outputClass + ".java";
 
     AST expans = AstCompiler.expand(expansion, (Class<Expansion>)Class.forName(expansionClassName));
 
-    if ( result != null ) {
-      AstCompiler.writeAST(expans, "ExpansionExpansion_try.java");
+    AstCompiler.writeAST(expans, "ExpansionExpansion_try" +repetitionInfo.getCurrentRepetition()+".java");
+    if (repetitionInfo.getCurrentRepetition() > 1 ) {
       assertEquals(expans, result, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
     }
     result = expans;

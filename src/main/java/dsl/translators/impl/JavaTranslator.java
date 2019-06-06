@@ -6,7 +6,7 @@ import dsl.translators.StringTranslator;
 public class JavaTranslator implements StringTranslator {
   @Override
   public String translate(AST ast) {
-    return translate(ast, ast.getTypeName());
+    return translate(ast, ast.getTypeName()).replace(";;", ";");
   }
 
   public String translate(AST ast, String enforcedType) {
@@ -63,9 +63,9 @@ public class JavaTranslator implements StringTranslator {
       case "ParamList":
       case "ArgList":
       	//HACK: Dirty trick to get type enforcing working for now:
-        if ( !ast.isList() ) {
-                return translate(ast);
-        }
+//        if ( !ast.isList() ) {
+//                return translate(ast);
+//        }
         // TODO: here we need to make sure the arguments/params end up in the right order.
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {

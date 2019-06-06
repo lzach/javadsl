@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AstCompiler {
-    private static final String BUILD_PATH = "target/classes/";
+    public static final String BUILD_PATH = "target/classes/";
 
 
     public static <E extends Expansion> AST  expand(AST ast, Class<E> expClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -40,6 +40,8 @@ public class AstCompiler {
         String outputName = className + ".java";
         writeAST(ast, outputName);
 
+        new File(AstCompiler.BUILD_PATH + className  + ".class").delete();
+
         Process pro = Runtime.getRuntime().exec("javac -d " + BUILD_PATH + " -g -cp " + BUILD_PATH + " " + outputName);
         pro.waitFor();
         BufferedReader is = new BufferedReader(new InputStreamReader(pro.getInputStream()));
@@ -51,7 +53,7 @@ public class AstCompiler {
         while ( (line = is.readLine()) != null ) {
             System.out.println(line);
         }
-
+       // new File(outputName).delete();
         assertEquals(0, pro.exitValue(), "Class " + className + " failed to compile");
 
         return Class.forName(className);

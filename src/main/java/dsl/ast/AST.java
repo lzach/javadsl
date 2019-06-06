@@ -90,12 +90,12 @@ public class AST {
     return create("IntLit", i);
   }
 
-    public static AST STRLit(String value) {
-        return new AST("String", new Object[]{"value", IDLit(value)}, (Object[])null);
-    }
+  public static AST STRLit(String value) {
+      return new AST("String", new Object[]{"value", IDLit(value)}, (Object[])null);
+  }
 
 
-    public String getMemberType() {
+  public String getMemberType() {
     return isMembers() ? "Members" : isList() ? "List" : "Value";
   }
 
