@@ -44,6 +44,14 @@ public class JavaTranslator implements StringTranslator {
 
         str += translate(ast.get("methods"), "MethodList") + "}\n";
         return str;
+      case "Generic":
+         str = translate(ast.get("type")) + "<";
+         String comma = "";
+         for ( AST gen : ast.get("gens").getMemberList() ) {
+           str += comma + translate(gen);
+           comma = ",";
+         }
+         return str + ">";
       case "Member":
         return translate(ast.get("lhs")) + "." + translate(ast.get("rhs"));
       case "Call":

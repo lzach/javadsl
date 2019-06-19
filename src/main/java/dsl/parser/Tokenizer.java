@@ -79,18 +79,26 @@ public class Tokenizer {
           }
           escape = !escape;
         } else if ( escape ) {
-          if (Objects.equals(c, "n")) {
-            builder.append("\n");
-          } else if (Objects.equals(c, "t") ) {
-            builder.append("\t");
-          } else if (Objects.equals(c, "r") ) {
-            builder.append("\r");
-          } else if (Objects.equals(c, "b") ) {
-            builder.append("\b");
-          } else {
-            builder.append(c);
+          switch (c) {
+            case "n":
+              builder.append("\n");
+              break;
+            case "t":
+              builder.append("\t");
+              break;
+            case "r":
+              builder.append("\r");
+              break;
+            case "b":
+              builder.append("\b");
+              break;
+            default:
+              builder.append(c);
+              break;
           }
           escape = false;
+        } else {
+          builder.append(c);
         }
         c = peek();
       }

@@ -92,7 +92,8 @@ public class Parser {
       case STR:
         typ = "String";
         val = value.getValue();
-        break;
+        return AST.STRLit(val.toString());
+//        break;
       default:
         throw new InvalidAstException("Expected a literal value");
     }

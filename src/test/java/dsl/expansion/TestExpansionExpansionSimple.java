@@ -1,8 +1,5 @@
 package dsl.expansion;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import common.AstCompiler;
 import common.CustomClassLoader;
 import dsl.ast.AST;
@@ -13,11 +10,15 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-public class TestExpansionExpansion  {
-  private static final String AST_CODE = "examples/expansion/expansion.dsl";
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class TestExpansionExpansionSimple {
+  private static final String AST_CODE = "examples/expansion/expansion-simple.dsl";
   private static final String BUILD_PATH = "target/classes/";
   private static final CustomClassLoader classLoader = new CustomClassLoader();
 
@@ -31,7 +32,7 @@ public class TestExpansionExpansion  {
     }
   }
 
-  private static String expansionClassName = "dsl.expansion.impl.ExpandedSwitchExpansion"; // Original expander
+  private static String expansionClassName = "dsl.expansion.impl.ExpandedSwitchExpansionSimple"; // Original expander
   private static AST result = null; // result of expansion
 
   @Test
@@ -51,12 +52,12 @@ public class TestExpansionExpansion  {
   @RepeatedTest(3)
   public void testCompile(RepetitionInfo repetitionInfo) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException, ClassNotFoundException {
 
-    String outputClass = "ExpansionExpansion" ;
+    String outputClass = "ExpansionExpansionSimple" ;
 
-    AST expans = AstCompiler.expand(expansion, (Class<Expansion>)new CustomClassLoader().loadClass(expansionClassName));
+    AST expans = AstCompiler.expand(expansion, (Class<Expansion>)classLoader.loadClass(expansionClassName));
 
-    AstCompiler.writeAST(expans, "ExpansionExpansion_try" +repetitionInfo.getCurrentRepetition()+".java");
-    if (repetitionInfo.getCurrentRepetition() > 2 ) {
+    AstCompiler.writeAST(expans, "ExpansionExpansionSimple_try" +repetitionInfo.getCurrentRepetition()+".java");
+    if (repetitionInfo.getCurrentRepetition() > 1 ) {
       assertEquals(expans, result, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
     }
     result = expans;

@@ -53,9 +53,9 @@ public class AstCompiler {
         while ( (line = is.readLine()) != null ) {
             System.out.println(line);
         }
-       // new File(outputName).delete();
+//        new File(outputName).delete();
         assertEquals(0, pro.exitValue(), "Class " + className + " failed to compile");
 
-        return Class.forName(className);
+        return new CustomClassLoader().loadClass(className);
     }
 }
