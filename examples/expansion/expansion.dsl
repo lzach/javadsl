@@ -53,14 +53,335 @@
                                         ))
                                         (Call function:(Member lhs:Collections rhs:reverse) args:(ArgList (Arg name:lst value:names)))
 
-                                        (Assign lhs:builder rhs:(New type:ASTBuilder args:(ArgList (Arg name:type value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList))))))
-                                        (For var:(Define name:memberName type:String) expr:names code:(Block
-                                             (Call function:(Member lhs:builder rhs:add) args:(ArgList
-                                                 (Arg name:name value:memberName)
-                                                 (Arg name:value value:(pop))
+                                        (Call function:(Member lhs:builder rhs:add) args:(ArgList
+                                             (Arg name:ast value:(Call
+                                                function:(Member
+                                                    lhs:(Call
+                                                        function:(Member
+                                                            lhs:(New type:ASTBuilder args:(ArgList
+                                                                      (Arg name:name value:"Assign")
+                                                                ))
+                                                            rhs:add
+                                                        )
+                                                        args:(ArgList
+                                                            (Arg name:name value:"lhs")
+                                                            (Arg name:value value:(Call
+                                                                function:(Member lhs:AST rhs:IDLit)
+                                                                args:(ArgList (Arg name:value value:"builder"))
+                                                            ))
+                                                        )
+                                                    )
+                                                    rhs:add
+                                                )
+                                                args:(ArgList
+                                                   (Arg name:name value:"rhs")
+                                                   (Arg name:value value:(Call
+                                                      function:(Member
+                                                         lhs:(Call
+                                                             function:(Member
+                                                                 lhs:(New type:ASTBuilder args:(ArgList
+                                                                        (Arg name:name value:"New")
+                                                                 ))
+                                                                 rhs:add
+                                                             )
+                                                             args:(ArgList
+                                                                (Arg name:name value:"type")
+                                                                (Arg name:value value:(Call
+                                                                    function:(Member lhs:AST rhs:IDLit)
+                                                                    args:(ArgList (Arg name:value value:"ASTBuilder"))
+                                                                ))
+                                                             )
+                                                         )
+                                                         rhs:add
+                                                      )
+                                                      args:(ArgList
+                                                          (Arg name:name value:"args")
+                                                          (Arg name:value value:(Call
+                                                                function:(Member
+                                                                   lhs:(New
+                                                                        type:ASTBuilder
+                                                                        args:(ArgList (Arg name:value value:"ArgList"))
+                                                                   )
+                                                                   rhs:add
+                                                                )
+                                                                args:(ArgList
+                                                                   (Arg name:ast value:(Call
+                                                                         function:(Member
+                                                                            lhs:(Call
+                                                                                function:(Member
+                                                                                    lhs:(New type:ASTBuilder args:(ArgList
+                                                                                           (Arg name:name value:"New")
+                                                                                    ))
+                                                                                    rhs:add
+                                                                                )
+                                                                                args:(ArgList
+                                                                                   (Arg name:name value:"type")
+                                                                                   (Arg name:value value:(Call
+                                                                                       function:(Member lhs:AST rhs:IDLit)
+                                                                                       args:(ArgList (Arg name:value value:"ASTBuilder"))
+                                                                                   ))
+                                                                                )
+                                                                            )
+                                                                            rhs:add
+                                                                         )
+                                                                         args:(ArgList
+                                                                             (Arg name:name value:"args")
+                                                                             (Arg name:value value:(Call
+                                                                                   function:(Member
+                                                                                       lhs:(Call
+                                                                                               function:(Member
+                                                                                                  lhs:(New
+                                                                                                       type:ASTBuilder
+                                                                                                       args:(ArgList (Arg name:value value:"Arg"))
+                                                                                                  )
+                                                                                                  rhs:add
+                                                                                               )
+                                                                                               args:(ArgList
+                                                                                                  (Arg name:name value:"name")
+                                                                                                  (Arg name:value value:(Call
+                                                                                                       function:(Member
+                                                                                                          lhs:AST
+                                                                                                          rhs:IDLit
+                                                                                                       )
+                                                                                                       args:(ArgList (Arg name:name value:"name"))
+
+                                                                                                  ))
+                                                                                               )
+                                                                                       )
+                                                                                       rhs:add
+                                                                                   )
+                                                                                   args:(ArgList
+                                                                                      (Arg name:name value:"value")
+                                                                                      (Arg name:value value:(Call
+                                                                                           function:(Member
+                                                                                              lhs:AST
+                                                                                              rhs:STRLit
+                                                                                           )
+                                                                                           args:(ArgList
+                                                                                             (Arg name:value value:(Call
+                                                                                                function:(Member
+                                                                                                   lhs:ast
+                                                                                                   rhs:getTypeName
+                                                                                                )
+                                                                                                args:(ArgList)
+                                                                                             ))
+                                                                                           )
+                                                                                      ))
+                                                                                   )
+                                                                             ))
+                                                                         )
+                                                                   ))
+                                                                )
+                                                          ))
+                                                      )
+                                                   ))
+                                                )
                                              ))
                                         ))
-                                        (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
+                                        (For var:(Define name:name type:String) expr:names code:(Block
+                                             (Call function:(Member lhs:builder rhs:add) args:(ArgList
+                                                  (Arg name:ast value:(Call
+                                                      function:(Member
+                                                          lhs:(Call
+                                                              function:(Member
+                                                                  lhs:(New type:ASTBuilder args:(ArgList
+                                                                            (Arg name:name value:"Call")
+                                                                      ))
+                                                                  rhs:add
+                                                              )
+                                                              args:(ArgList
+                                                                  (Arg name:name value:"function")
+                                                                  (Arg name:value value:(Call
+                                                                     function:(Member
+                                                                         lhs:(Call
+                                                                             function:(Member
+                                                                                 lhs:(New type:ASTBuilder args:(ArgList
+                                                                                           (Arg name:name value:"Member")
+                                                                                     ))
+                                                                                 rhs:add
+                                                                             )
+                                                                             args:(ArgList
+                                                                                 (Arg name:name value:"lhs")
+                                                                                 (Arg name:value value:(Call
+                                                                                     function:(Member lhs:AST rhs:IDLit)
+                                                                                     args:(ArgList (Arg name:value value:"builder"))
+                                                                                 ))
+                                                                             )
+                                                                         )
+                                                                         rhs:add
+                                                                     )
+                                                                     args:(ArgList
+                                                                        (Arg name:name value:"rhs")
+                                                                        (Arg name:value value:(Call
+                                                                           function:(Member lhs:AST rhs:IDLit)
+                                                                           args:(ArgList (Arg name:value value:"add"))
+                                                                        ))
+                                                                     )
+                                                                  ))
+                                                              )
+                                                          )
+                                                          rhs:add
+                                                      )
+                                                      args:(ArgList
+                                                         (Arg name:name value:"args")
+                                                         (Arg name:value value:(Call
+                                                               function:(Member
+                                                                  lhs:(New
+                                                                       type:ASTBuilder
+                                                                       args:(ArgList (Arg name:value value:"ArgList"))
+                                                                  )
+                                                                  rhs:add
+                                                               )
+                                                               args:(ArgList
+                                                                  (Arg name:ast value:(Call
+                                                                        function:(Member
+                                                                           lhs:(Call
+                                                                                function:(Member
+                                                                                   lhs:(Call
+                                                                                       function:(Member
+                                                                                           lhs:(New type:ASTBuilder args:(ArgList
+                                                                                                  (Arg name:name value:"New")
+                                                                                           ))
+                                                                                           rhs:add
+                                                                                       )
+                                                                                       args:(ArgList
+                                                                                          (Arg name:name value:"type")
+                                                                                          (Arg name:value value:(Call
+                                                                                              function:(Member lhs:AST rhs:IDLit)
+                                                                                              args:(ArgList (Arg name:value value:"ASTBuilder"))
+                                                                                          ))
+                                                                                       )
+                                                                                   )
+                                                                                   rhs:add
+                                                                                )
+                                                                                args:(ArgList
+                                                                                    (Arg name:name value:"args")
+                                                                                    (Arg name:value value:(Call
+                                                                                          function:(Member
+                                                                                              lhs:(Call
+                                                                                                      function:(Member
+                                                                                                         lhs:(New
+                                                                                                              type:ASTBuilder
+                                                                                                              args:(ArgList (Arg name:value value:"Arg"))
+                                                                                                         )
+                                                                                                         rhs:add
+                                                                                                      )
+                                                                                                      args:(ArgList
+                                                                                                         (Arg name:name value:"name")
+                                                                                                         (Arg name:value value:(Call
+                                                                                                              function:(Member
+                                                                                                                 lhs:AST
+                                                                                                                 rhs:IDLit
+                                                                                                              )
+                                                                                                              args:(ArgList (Arg name:name value:"name"))
+
+                                                                                                         ))
+                                                                                                      )
+                                                                                              )
+                                                                                              rhs:add
+                                                                                          )
+                                                                                          args:(ArgList
+                                                                                             (Arg name:name value:"name")
+                                                                                             (Arg name:value value:(Call
+                                                                                                   function:(Member lhs:AST rhs:STRLit)
+                                                                                                   args:(ArgList (Arg name:value value:name))
+                                                                                             ))
+                                                                                          )
+                                                                                    ))
+                                                                                )
+                                                                           )
+                                                                           rhs:add
+                                                                        )
+                                                                        args:(ArgList
+                                                                              (Arg name:name value:"args")
+                                                                              (Arg name:value value:(Call
+                                                                                    function:(Member
+                                                                                        lhs:(Call
+                                                                                                function:(Member
+                                                                                                   lhs:(New
+                                                                                                        type:ASTBuilder
+                                                                                                        args:(ArgList (Arg name:value value:"Arg"))
+                                                                                                   )
+                                                                                                   rhs:add
+                                                                                                )
+                                                                                                args:(ArgList
+                                                                                                   (Arg name:name value:"name")
+                                                                                                   (Arg name:value value:(Call
+                                                                                                        function:(Member
+                                                                                                           lhs:AST
+                                                                                                           rhs:IDLit
+                                                                                                        )
+                                                                                                        args:(ArgList (Arg name:name value:"name"))
+
+                                                                                                   ))
+                                                                                                )
+                                                                                        )
+                                                                                        rhs:add
+                                                                                    )
+                                                                                    args:(ArgList
+                                                                                       (Arg name:name value:"value")
+                                                                                       (Arg name:value value:(Call
+                                                                                               function:(Member
+                                                                                                   lhs:(Call
+                                                                                                       function:(Member
+                                                                                                           lhs:(New type:ASTBuilder args:(ArgList
+                                                                                                                     (Arg name:name value:"Call")
+                                                                                                               ))
+                                                                                                           rhs:add
+                                                                                                       )
+                                                                                                       args:(ArgList
+                                                                                                           (Arg name:name value:"function")
+                                                                                                           (Arg name:value value:(Call
+                                                                                                              function:(Member
+                                                                                                                  lhs:(Call
+                                                                                                                      function:(Member
+                                                                                                                          lhs:(New type:ASTBuilder args:(ArgList
+                                                                                                                                    (Arg name:name value:"Member")
+                                                                                                                              ))
+                                                                                                                          rhs:add
+                                                                                                                      )
+                                                                                                                      args:(ArgList
+                                                                                                                          (Arg name:name value:"lhs")
+                                                                                                                          (Arg name:value value:(Call
+                                                                                                                              function:(Member lhs:AST rhs:IDLit)
+                                                                                                                              args:(ArgList (Arg name:value value:"bQue"))
+                                                                                                                          ))
+                                                                                                                      )
+                                                                                                                  )
+                                                                                                                  rhs:add
+                                                                                                              )
+                                                                                                              args:(ArgList
+                                                                                                                 (Arg name:name value:"rhs")
+                                                                                                                 (Arg name:value value:(Call
+                                                                                                                    function:(Member lhs:AST rhs:IDLit)
+                                                                                                                    args:(ArgList (Arg name:value value:"pop"))
+                                                                                                                 ))
+                                                                                                              )
+                                                                                                           ))
+                                                                                                       )
+                                                                                                   )
+                                                                                                   rhs:add
+                                                                                               )
+                                                                                               args:(ArgList
+                                                                                                  (Arg name:name value:"args")
+                                                                                                  (Arg name:value value:(New
+                                                                                                        type:ASTBuilder
+                                                                                                        args:(ArgList (Arg name:value value:"ArgList"))
+
+                                                                                                  ))
+                                                                                               )
+                                                                                       ))
+
+                                                                                    )
+                                                                              ))
+                                                                        )
+                                                                  ))
+                                                               )
+                                                         ))
+                                                      )
+                                                  ))
+                                             ))
+                                        ))
                                      ) otherwise:(Block
                                          (If cond:(isList) code:(Block
                                             (Call function:(Member lhs:builder rhs:setName) args:(ArgList (Arg name:name value:"List")))
@@ -202,11 +523,169 @@
                                             ))
                                             (For var:(Define name:ignored type:AST) expr:members code:(Block
                                                  (Call function:(Member lhs:builder rhs:add) args:(ArgList
-                                                    (Arg name:ast value:(Call function:(Member lhs:bQue rhs:pop) args:(ArgList
-                                                    )))
+                                                      (Arg name:ast value:(Call
+                                                          function:(Member
+                                                              lhs:(Call
+                                                                  function:(Member
+                                                                      lhs:(New type:ASTBuilder args:(ArgList
+                                                                                (Arg name:name value:"Call")
+                                                                          ))
+                                                                      rhs:add
+                                                                  )
+                                                                  args:(ArgList
+                                                                      (Arg name:name value:"function")
+                                                                      (Arg name:value value:(Call
+                                                                         function:(Member
+                                                                             lhs:(Call
+                                                                                 function:(Member
+                                                                                     lhs:(New type:ASTBuilder args:(ArgList
+                                                                                               (Arg name:name value:"Member")
+                                                                                         ))
+                                                                                     rhs:add
+                                                                                 )
+                                                                                 args:(ArgList
+                                                                                     (Arg name:name value:"lhs")
+                                                                                     (Arg name:value value:(Call
+                                                                                         function:(Member lhs:AST rhs:IDLit)
+                                                                                         args:(ArgList (Arg name:value value:"builder"))
+                                                                                     ))
+                                                                                 )
+                                                                             )
+                                                                             rhs:add
+                                                                         )
+                                                                         args:(ArgList
+                                                                            (Arg name:name value:"rhs")
+                                                                            (Arg name:value value:(Call
+                                                                               function:(Member lhs:AST rhs:IDLit)
+                                                                               args:(ArgList (Arg name:value value:"add"))
+                                                                            ))
+                                                                         )
+                                                                      ))
+                                                                  )
+                                                              )
+                                                              rhs:add
+                                                          )
+                                                          args:(ArgList
+                                                             (Arg name:name value:"args")
+                                                             (Arg name:value value:(Call
+                                                                   function:(Member
+                                                                      lhs:(New
+                                                                           type:ASTBuilder
+                                                                           args:(ArgList (Arg name:value value:"ArgList"))
+                                                                      )
+                                                                      rhs:add
+                                                                   )
+                                                                   args:(ArgList
+                                                                      (Arg name:ast value:(Call
+                                                                            function:(Member
+                                                                               lhs:(Call
+                                                                                   function:(Member
+                                                                                       lhs:(New type:ASTBuilder args:(ArgList
+                                                                                              (Arg name:name value:"New")
+                                                                                       ))
+                                                                                       rhs:add
+                                                                                   )
+                                                                                   args:(ArgList
+                                                                                      (Arg name:name value:"type")
+                                                                                      (Arg name:value value:(Call
+                                                                                          function:(Member lhs:AST rhs:IDLit)
+                                                                                          args:(ArgList (Arg name:value value:"ASTBuilder"))
+                                                                                      ))
+                                                                                   )
+                                                                               )
+                                                                               rhs:add
+                                                                            )
+                                                                            args:(ArgList
+                                                                                (Arg name:name value:"args")
+                                                                                (Arg name:value value:(Call
+                                                                                      function:(Member
+                                                                                          lhs:(Call
+                                                                                                  function:(Member
+                                                                                                     lhs:(New
+                                                                                                          type:ASTBuilder
+                                                                                                          args:(ArgList (Arg name:value value:"Arg"))
+                                                                                                     )
+                                                                                                     rhs:add
+                                                                                                  )
+                                                                                                  args:(ArgList
+                                                                                                     (Arg name:name value:"name")
+                                                                                                     (Arg name:value value:(Call
+                                                                                                          function:(Member
+                                                                                                             lhs:AST
+                                                                                                             rhs:IDLit
+                                                                                                          )
+                                                                                                          args:(ArgList (Arg name:name value:"name"))
+
+                                                                                                     ))
+                                                                                                  )
+                                                                                          )
+                                                                                          rhs:add
+                                                                                      )
+                                                                                      args:(ArgList
+                                                                                         (Arg name:name value:"value")
+                                                                                         (Arg name:value value:(ArgList
+                                                                                             (Arg name:ast value:(Call
+                                                                                                 function:(Member
+                                                                                                     lhs:(Call
+                                                                                                         function:(Member
+                                                                                                             lhs:(New type:ASTBuilder args:(ArgList
+                                                                                                                       (Arg name:name value:"Call")
+                                                                                                                 ))
+                                                                                                             rhs:add
+                                                                                                         )
+                                                                                                         args:(ArgList
+                                                                                                             (Arg name:name value:"function")
+                                                                                                             (Arg name:value value:(Call
+                                                                                                                function:(Member
+                                                                                                                    lhs:(Call
+                                                                                                                        function:(Member
+                                                                                                                            lhs:(New type:ASTBuilder args:(ArgList
+                                                                                                                                      (Arg name:name value:"Member")
+                                                                                                                                ))
+                                                                                                                            rhs:add
+                                                                                                                        )
+                                                                                                                        args:(ArgList
+                                                                                                                            (Arg name:name value:"lhs")
+                                                                                                                            (Arg name:value value:(Call
+                                                                                                                                function:(Member lhs:AST rhs:IDLit)
+                                                                                                                                args:(ArgList (Arg name:value value:"bQue"))
+                                                                                                                            ))
+                                                                                                                        )
+                                                                                                                    )
+                                                                                                                    rhs:add
+                                                                                                                )
+                                                                                                                args:(ArgList
+                                                                                                                   (Arg name:name value:"rhs")
+                                                                                                                   (Arg name:value value:(Call
+                                                                                                                      function:(Member lhs:AST rhs:IDLit)
+                                                                                                                      args:(ArgList (Arg name:value value:"pop"))
+                                                                                                                   ))
+                                                                                                                )
+                                                                                                             ))
+                                                                                                         )
+                                                                                                     )
+                                                                                                     rhs:add
+                                                                                                 )
+                                                                                                 args:(ArgList
+                                                                                                    (Arg name:name value:"args")
+                                                                                                    (Arg name:value value:(New
+                                                                                                          type:ASTBuilder
+                                                                                                          args:(ArgList (Arg name:value value:"ArgList"))
+
+                                                                                                    ))
+                                                                                                 )
+                                                                                             ))
+                                                                                        ))
+                                                                                      )
+                                                                                ))
+                                                                            )
+                                                                      ))
+                                                                   )
+                                                             ))
+                                                          )
+                                                      ))
                                                  ))
                                             ))
-                                            (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
                                          ) otherwise:(Block
                                             (Call function:(Member lhs:builder rhs:setName) args:(ArgList
                                                 (Arg name:value value:(Call function:(Member lhs:ast rhs:getTypeName) args:(ArgList)))
@@ -214,7 +693,6 @@
                                             (Call function:(Member lhs:builder rhs:set) args:(ArgList
                                                 (Arg name:value value:(Call function:(Member lhs:ast rhs:getValue) args:(ArgList)))
                                             ))
-                                            (push value:(Call function:(Member lhs:builder rhs:create) args:(ArgList)))
                                      ))))
                                   ))
 
