@@ -115,6 +115,8 @@ public class JavaTranslator implements StringTranslator {
         return "case " + translate(ast.get("value")) + ":\n" + translate(ast.get("block")) + "\n";
       case "Default":
         return "default:\n" + translate(ast.get("block")) + "\n";
+      case "Break":
+        return "break\n";
       case "Assign":
         return translate(ast.get("lhs")) + " = " + translate(ast.get("rhs"));
       case "Return":

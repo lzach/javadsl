@@ -80,29 +80,38 @@ public class ExpandedSwitchExpansion extends Expansion {
                               .add("name", AST.IDLit("value"))
                               .add("value",
                                   new ASTBuilder("Call")
-                                      .add("function",
-                                          new ASTBuilder("Member")
-                                              .add("lhs", AST.IDLit("ast"))
-                                              .add("rhs", AST.IDLit("get"))
-                                              .create())
+                                      .add("function", AST.IDLit("expand"))
                                       .add("args",
                                           new ASTBuilder("ArgList")
-                                              .add(
-                                                  new ASTBuilder("Arg")
-                                                      .add("name", AST.IDLit("name"))
-                                                      .add("value",
-                                                          new ASTBuilder("Call")
-                                                              .add("function",
-                                                                  new ASTBuilder("Member")
-                                                                      .add("lhs", createCreate().create())
-                                                                      .add("rhs", AST.IDLit("toString"))
+                                              .add(new ASTBuilder("Arg")
+                                                  .add("name", AST.STRLit("ast"))
+                                                  .add("value", new ASTBuilder("Call")
+                                                      .add("function",
+                                                          new ASTBuilder("Member")
+                                                              .add("lhs", AST.IDLit("ast"))
+                                                              .add("rhs", AST.IDLit("get"))
+                                                              .create())
+                                                      .add("args",
+                                                          new ASTBuilder("ArgList")
+                                                              .add(
+                                                                  new ASTBuilder("Arg")
+                                                                      .add("name", AST.IDLit("name"))
+                                                                      .add("value",
+                                                                          new ASTBuilder("Call")
+                                                                              .add("function",
+                                                                                  new ASTBuilder("Member")
+                                                                                      .add("lhs", createCreate().create())
+                                                                                      .add("rhs", AST.IDLit("toString"))
+                                                                                      .create())
+                                                                              .add("args", AST.emptyList("ArgList"))
+                                                                              .create())
                                                                       .create())
-                                                              .add("args", AST.emptyList("ArgList"))
                                                               .create())
                                                       .create())
+                                                  .create())
                                               .create())
-                                      .create())
-                                  .create())
+                                      .create()
+                                  ).create())
                           .create())
                   .create());
           }
@@ -854,6 +863,7 @@ public class ExpandedSwitchExpansion extends Expansion {
       case "expFunName":
         return new ASTBuilder("List")
             .add(expand(ast.get("type")))
+            .add(createDefineBuilder().create())
             .add(new ASTBuilder("Call")
                 .add("function",
                     new ASTBuilder("Member")
@@ -905,110 +915,7 @@ public class ExpandedSwitchExpansion extends Expansion {
             .create();
 
       default:
-          builder.setName(ast.getTypeName());
-          if (ast.isMembers()) {
-            builder.setName("List");
-            List<String> names = new ArrayList<>();
-            for (String member : ast.getMembers()) {
-              AST child = expand(ast.get(member));
-              if (child != null) {
-                names.add(member);
-                builder.add(child);
-              }
-            }
-            Collections.reverse(names);
-            createDefineAssignBuilder(ast, builder);
-            for (String name : names) {
-              builder.add(
-                  new ASTBuilder("Call")
-                      .add("function",
-                          new ASTBuilder("Member")
-                              .add("lhs", AST.IDLit("builder"))
-                              .add("rhs", AST.IDLit("add"))
-                              .create())
-                      .add("args",
-                          new ASTBuilder("ArgList")
-                              .add(
-                                  new ASTBuilder("Arg")
-                                      .add("name", AST.IDLit("name"))
-                                      .add("value",
-                                              new ASTBuilder("String")
-                                                      .add("value", AST.IDLit(name))
-                                                      .create())
-                                      .create())
-                              .add(
-                                  new ASTBuilder("Arg")
-                                      .add("name", AST.IDLit("ast"))
-                                      .add("value", createCreate().create())
-                                      .create())
-                              .create())
-                      .create());
-            }
-            createPush(builder);
-
-          } else if (ast.isList()) {
-            assert ast.getMemberList() != null;
-            builder.setName("List");
-            List<AST> asts = new ArrayList<>();
-            for (AST child : ast.getMemberList()) {
-              child = expand(child);
-              if (child != null) {
-                asts.add(child);
-              }
-            }
-            Collections.reverse(asts);
-            for (AST child : asts) {
-              builder.add(child);
-            }
-
-            createDefineAssignBuilder(ast, builder);
-            for (AST ignored : asts) {
-              builder.add(createPopToBuilder().create());
-            }
-            createPush(builder);
-          } else {
-            assert ast.getValue() != null;
-            builder = new ASTBuilder("List");
-            builder.add(
-                new ASTBuilder("Assign")
-                    .add("lhs", AST.IDLit("builder"))
-                    .add("rhs",
-                        new ASTBuilder("New")
-                            .add("type", AST.IDLit("ASTBuilder"))
-                            .add("args",
-                                new ASTBuilder("ArgList")
-                                    .add(
-                                        new ASTBuilder("Arg")
-                                            .add("name", AST.IDLit("name"))
-                                            .add("value",
-                                                new ASTBuilder("String")
-                                                    .add("value", AST.IDLit(ast.getTypeName()))
-                                                    .create())
-                                            .create())
-                                    .create())
-                            .create())
-                    .create());
-            builder.add(
-                    new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", AST.IDLit("builder"))
-                                .add("rhs", AST.IDLit("set"))
-                                .create())
-                        .add("args",
-                            new ASTBuilder("ArgList")
-                                .add(
-                                    new ASTBuilder("Arg")
-                                        .add("name", AST.IDLit("value"))
-                                        .add("value",
-                                            new ASTBuilder("String")
-                                                .add("value", AST.IDLit(ast.getValue().toString()))
-                                                .create())
-                                        .create())
-                                .create())
-                        .create());
-            createPush(builder);
-          }
+          return doStatic(ast);
     }
 
     return builder.create();
@@ -1230,6 +1137,24 @@ public class ExpandedSwitchExpansion extends Expansion {
                 new ASTBuilder("Name")
                     .add(AST.IDLit("java"))
                     .add(AST.IDLit("util"))
+                    .add(AST.IDLit("List"))
+                    .create())
+            .create());
+    listAST.add(
+        new ASTBuilder("Import")
+            .add("name",
+                new ASTBuilder("Name")
+                    .add(AST.IDLit("java"))
+                    .add(AST.IDLit("util"))
+                    .add(AST.IDLit("ArrayList"))
+                    .create())
+            .create());
+    listAST.add(
+        new ASTBuilder("Import")
+            .add("name",
+                new ASTBuilder("Name")
+                    .add(AST.IDLit("java"))
+                    .add(AST.IDLit("util"))
                     .add(AST.IDLit("Map"))
                     .create())
             .create());
@@ -1352,6 +1277,1158 @@ public class ExpandedSwitchExpansion extends Expansion {
                  .add("block", callExpansion(/*literalItem*/mLExp))
               .create());
     }
+    ASTBuilder defaultBlock = new ASTBuilder("Default");
+    defaultBlock.add("block",
+        new ASTBuilder("Block")
+            .add(new ASTBuilder("Define")
+                .add("type",
+                    new ASTBuilder("Generic")
+                        .add("type", AST.IDLit("List"))
+                        .add("gens",
+                            new ASTBuilder("List")
+                                .add(AST.IDLit("String"))
+                                .create())
+                        .create())
+                .add("name", AST.IDLit("names"))
+                .create())
+            .add(new ASTBuilder("Define")
+                .add("type",
+                    new ASTBuilder("Generic")
+                        .add("type", AST.IDLit("List"))
+                        .add("gens",
+                            new ASTBuilder("List")
+                                .add(AST.IDLit("AST"))
+                                .create())
+                        .create())
+                .add("name", AST.IDLit("members"))
+                .create())
+            .add(new ASTBuilder("Assign")
+                .add("lhs", AST.IDLit("names"))
+                .add("rhs",
+                    new ASTBuilder("New")
+                        .add("type", new ASTBuilder("Generic")
+                            .add("type", AST.IDLit("ArrayList"))
+                            .add("gens",
+                                new ASTBuilder("List")
+                                    .add(AST.IDLit("String"))
+                                    .create())
+                            .create())
+                        .add("args", AST.emptyList("ArgList"))
+                        .create())
+                .create())
+            .add(new ASTBuilder("Assign")
+                .add("lhs", AST.IDLit("members"))
+                .add("rhs",
+                    new ASTBuilder("New")
+                        .add("type", new ASTBuilder("Generic")
+                            .add("type", AST.IDLit("ArrayList"))
+                            .add("gens",
+                                new ASTBuilder("List")
+                                    .add(AST.IDLit("AST"))
+                                    .create())
+                            .create())
+                        .add("args", AST.emptyList("ArgList"))
+                        .create())
+                .create())
+            .add(new ASTBuilder("If")
+                .add("cond",
+                    new ASTBuilder("Call")
+                        .add("function",
+                            new ASTBuilder("Member")
+                                .add("lhs", AST.IDLit("ast"))
+                                .add("rhs", AST.IDLit("isMembers"))
+                                .create())
+                        .add("args", AST.emptyList("ArgList"))
+                        .create())
+                .add("code",
+                       new ASTBuilder("Block")
+                           .add(new ASTBuilder("Call")
+                               .add("function",
+                                   new ASTBuilder("Member")
+                                       .add("lhs", AST.IDLit("builder"))
+                                       .add("rhs", AST.IDLit("setName"))
+                                       .create())
+                               .add("args",
+                                   new ASTBuilder("ArgList")
+                                       .add(new ASTBuilder("Arg")
+                                           .add("name", AST.IDLit("name"))
+                                           .add("value", AST.STRLit("List"))
+                                           .create())
+                                       .create())
+                               .create())
+                           .add(new ASTBuilder("For")
+                               .add("var",
+                                   new ASTBuilder("Define")
+                                       .add("type", AST.IDLit("String"))
+                                       .add("name", AST.IDLit("memberName"))
+                                       .create())
+                               .add("expr",
+                                   new ASTBuilder("Call")
+                                       .add("function",
+                                           new ASTBuilder("Member")
+                                               .add("lhs", AST.IDLit("ast"))
+                                               .add("rhs", AST.IDLit("getMembers"))
+                                               .create())
+                                       .add("args", AST.emptyList("ArgList"))
+                                       .create())
+                               .add("code",
+                                   new ASTBuilder("Block")
+                                       .add(new ASTBuilder("Assign")
+                                               .add("lhs",
+                                                   new ASTBuilder("Define")
+                                                       .add("type", AST.IDLit("AST"))
+                                                       .add("name", AST.IDLit("child"))
+                                                       .create())
+                                               .add("rhs",
+                                                   new ASTBuilder("Call")
+                                                       .add("function", AST.IDLit("expand"))
+                                                       .add("args",
+                                                           new ASTBuilder("ArgList")
+                                                               .add(new ASTBuilder("Arg")
+                                                                   .add("name", AST.IDLit("ast"))
+                                                                   .add("value",
+                                                                       new ASTBuilder("Call")
+                                                                           .add("function",
+                                                                               new ASTBuilder("Member")
+                                                                                   .add("lhs", AST.IDLit("ast"))
+                                                                                   .add("rhs", AST.IDLit("get"))
+                                                                                   .create())
+                                                                           .add("args",
+                                                                               new ASTBuilder("ArgList")
+                                                                                   .add(new ASTBuilder("Arg")
+                                                                                       .add("name", AST.IDLit("name"))
+                                                                                       .add("value", AST.IDLit("memberName"))
+                                                                                       .create())
+                                                                                   .create())
+                                                                           .create())
+                                                                   .create())
+                                                               .create())
+                                                       .create())
+                                               .create())
+                                       .add(new ASTBuilder("If")
+                                           .add("cond",
+                                               new ASTBuilder("Neq")
+                                                   .add("lhs", AST.IDLit("child"))
+                                                   .add("rhs", AST.IDLit("null"))
+                                                   .create())
+                                           .add("code",
+                                               new ASTBuilder("Block")
+                                                   .add(new ASTBuilder("Call")
+                                                           .add("function",
+                                                               new ASTBuilder("Member")
+                                                                   .add("lhs", AST.IDLit("names"))
+                                                                   .add("rhs", AST.IDLit("add"))
+                                                                   .create())
+                                                           .add("args",
+                                                               new ASTBuilder("ArgList")
+                                                                   .add(new ASTBuilder("Arg")
+                                                                       .add("name", AST.IDLit("name"))
+                                                                       .add("value", AST.IDLit("memberName"))
+                                                                       .create())
+                                                                   .create())
+                                                           .create())
+                                                   .add(new ASTBuilder("Call")
+                                                           .add("function",
+                                                               new ASTBuilder("Member")
+                                                                   .add("lhs", AST.IDLit("bQue"))
+                                                                   .add("rhs", AST.IDLit("push"))
+                                                                   .create())
+                                                           .add("args",
+                                                               new ASTBuilder("ArgList")
+                                                                   .add(new ASTBuilder("Arg")
+                                                                       .add("name", AST.IDLit("name"))
+                                                                       .add("value", AST.IDLit("child"))
+                                                                       .create())
+                                                                   .create())
+                                                           .create())
+                                                   .create())
+                                           .create())
+                                       .create())
+                               .create())
+                           .add(new ASTBuilder("Call")
+                                   .add("function",
+                                       new ASTBuilder("Member")
+                                           .add("lhs", AST.IDLit("Collections"))
+                                           .add("rhs", AST.IDLit("reverse"))
+                                           .create())
+                                   .add("args",
+                                       new ASTBuilder("ArgList")
+                                           .add(new ASTBuilder("Arg")
+                                               .add("name", AST.IDLit("name"))
+                                               .add("value", AST.IDLit("names"))
+                                               .create())
+                                           .create())
+                                   .create())
+                           .add(new ASTBuilder("Call")
+                                   .add("function",
+                                       new ASTBuilder("Member")
+                                           .add("lhs", AST.IDLit("builder"))
+                                           .add("rhs", AST.IDLit("add"))
+                                           .create())
+                                   .add("args",
+                                       new ASTBuilder("ArgList")
+                                           .add(new ASTBuilder("Arg")
+                                               .add("name", AST.IDLit("ast"))
+                                               .add("value", AST.IDLit("null"))
+                                               .create())
+                                           .create())
+                                   .create())
+
+//              (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                   (Arg name:ast value:(Call
+//                      function:(Member
+//                          lhs:(Call
+//                              function:(Member
+//                                  lhs:(New type:ASTBuilder args:(ArgList
+//                                            (Arg name:name value:"Assign")
+//                                      ))
+//                                  rhs:add
+//                              )
+//                              args:(ArgList
+//                                  (Arg name:name value:"lhs")
+//                                  (Arg name:value value:(Call
+//                                      function:(Member lhs:AST rhs:IDLit)
+//                                      args:(ArgList (Arg name:value value:"builder"))
+//                                  ))
+//                              )
+//                          )
+//                          rhs:add
+//                      )
+//                      args:(ArgList
+//                         (Arg name:name value:"rhs")
+//                         (Arg name:value value:(Call
+//                            function:(Member
+//                               lhs:(Call
+//                                   function:(Member
+//                                       lhs:(New type:ASTBuilder args:(ArgList
+//                                              (Arg name:name value:"New")
+//                                       ))
+//                                       rhs:add
+//                                   )
+//                                   args:(ArgList
+//                                      (Arg name:name value:"type")
+//                                      (Arg name:value value:(Call
+//                                          function:(Member lhs:AST rhs:IDLit)
+//                                          args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                      ))
+//                                   )
+//                               )
+//                               rhs:add
+//                            )
+//                            args:(ArgList
+//                                (Arg name:name value:"args")
+//                                (Arg name:value value:(Call
+//                                      function:(Member
+//                                         lhs:(New
+//                                              type:ASTBuilder
+//                                              args:(ArgList (Arg name:value value:"ArgList"))
+//                                         )
+//                                         rhs:add
+//                                      )
+//                                      args:(ArgList
+//                                         (Arg name:ast value:(Call
+//                                               function:(Member
+//                                                  lhs:(Call
+//                                                      function:(Member
+//                                                          lhs:(New type:ASTBuilder args:(ArgList
+//                                                                 (Arg name:name value:"New")
+//                                                          ))
+//                                                          rhs:add
+//                                                      )
+//                                                      args:(ArgList
+//                                                         (Arg name:name value:"type")
+//                                                         (Arg name:value value:(Call
+//                                                             function:(Member lhs:AST rhs:IDLit)
+//                                                             args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                         ))
+//                                                      )
+//                                                  )
+//                                                  rhs:add
+//                                               )
+//                                               args:(ArgList
+//                                                   (Arg name:name value:"args")
+//                                                   (Arg name:value value:(Call
+//                                                         function:(Member
+//                                                             lhs:(Call
+//                                                                     function:(Member
+//                                                                        lhs:(New
+//                                                                             type:ASTBuilder
+//                                                                             args:(ArgList (Arg name:value value:"Arg"))
+//                                                                        )
+//                                                                        rhs:add
+//                                                                     )
+//                                                                     args:(ArgList
+//                                                                        (Arg name:name value:"name")
+//                                                                        (Arg name:value value:(Call
+//                                                                             function:(Member
+//                                                                                lhs:AST
+//                                                                                rhs:STRLit
+//                                                                             )
+//                                                                             args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                        ))
+//                                                                     )
+//                                                             )
+//                                                             rhs:add
+//                                                         )
+//                                                         args:(ArgList
+//                                                            (Arg name:name value:"value")
+//                                                            (Arg name:value value:(Call
+//                                                                 function:(Member
+//                                                                    lhs:AST
+//                                                                    rhs:STRLit
+//                                                                 )
+//                                                                 args:(ArgList
+//                                                                   (Arg name:value value:(Call
+//                                                                      function:(Member
+//                                                                         lhs:ast
+//                                                                         rhs:getTypeName
+//                                                                      )
+//                                                                      args:(ArgList)
+//                                                                   ))
+//                                                                 )
+//                                                            ))
+//                                                         )
+//                                                   ))
+//                                               )
+//                                         ))
+//                                      )
+//                                ))
+//                            )
+//                         ))
+//                      )
+//                   ))
+//              ))
+//              (For var:(Define name:name type:String) expr:names code:(Block
+//                   (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                        (Arg name:ast value:(Call
+//                            function:(Member
+//                                lhs:(Call
+//                                    function:(Member
+//                                        lhs:(New type:ASTBuilder args:(ArgList
+//                                                  (Arg name:name value:"Call")
+//                                            ))
+//                                        rhs:add
+//                                    )
+//                                    args:(ArgList
+//                                        (Arg name:name value:"function")
+//                                        (Arg name:value value:(Call
+//                                           function:(Member
+//                                               lhs:(Call
+//                                                   function:(Member
+//                                                       lhs:(New type:ASTBuilder args:(ArgList
+//                                                                 (Arg name:name value:"Member")
+//                                                           ))
+//                                                       rhs:add
+//                                                   )
+//                                                   args:(ArgList
+//                                                       (Arg name:name value:"lhs")
+//                                                       (Arg name:value value:(Call
+//                                                           function:(Member lhs:AST rhs:IDLit)
+//                                                           args:(ArgList (Arg name:value value:"builder"))
+//                                                       ))
+//                                                   )
+//                                               )
+//                                               rhs:add
+//                                           )
+//                                           args:(ArgList
+//                                              (Arg name:name value:"rhs")
+//                                              (Arg name:value value:(Call
+//                                                 function:(Member lhs:AST rhs:IDLit)
+//                                                 args:(ArgList (Arg name:value value:"add"))
+//                                              ))
+//                                           )
+//                                        ))
+//                                    )
+//                                )
+//                                rhs:add
+//                            )
+//                            args:(ArgList
+//                               (Arg name:name value:"args")
+//                               (Arg name:value value:(Call
+//                                     function:(Member
+//                                        lhs:(New
+//                                             type:ASTBuilder
+//                                             args:(ArgList (Arg name:value value:"ArgList"))
+//                                        )
+//                                        rhs:add
+//                                     )
+//                                     args:(ArgList
+//                                        (Arg name:ast value:(Call
+//                                              function:(Member
+//                                                 lhs:(Call
+//                                                      function:(Member
+//                                                         lhs:(Call
+//                                                             function:(Member
+//                                                                 lhs:(New type:ASTBuilder args:(ArgList
+//                                                                        (Arg name:name value:"New")
+//                                                                 ))
+//                                                                 rhs:add
+//                                                             )
+//                                                             args:(ArgList
+//                                                                (Arg name:name value:"type")
+//                                                                (Arg name:value value:(Call
+//                                                                    function:(Member lhs:AST rhs:IDLit)
+//                                                                    args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                                ))
+//                                                             )
+//                                                         )
+//                                                         rhs:add
+//                                                      )
+//                                                      args:(ArgList
+//                                                          (Arg name:name value:"args")
+//                                                          (Arg name:value value:(Call
+//                                                                function:(Member
+//                                                                    lhs:(Call
+//                                                                            function:(Member
+//                                                                               lhs:(New
+//                                                                                    type:ASTBuilder
+//                                                                                    args:(ArgList (Arg name:value value:"Arg"))
+//                                                                               )
+//                                                                               rhs:add
+//                                                                            )
+//                                                                            args:(ArgList
+//                                                                               (Arg name:name value:"name")
+//                                                                               (Arg name:value value:(Call
+//                                                                                    function:(Member
+//                                                                                       lhs:AST
+//                                                                                       rhs:IDLit
+//                                                                                    )
+//                                                                                    args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                               ))
+//                                                                            )
+//                                                                    )
+//                                                                    rhs:add
+//                                                                )
+//                                                                args:(ArgList
+//                                                                   (Arg name:name value:"name")
+//                                                                   (Arg name:value value:(Call
+//                                                                         function:(Member lhs:AST rhs:STRLit)
+//                                                                         args:(ArgList (Arg name:value value:name))
+//                                                                   ))
+//                                                                )
+//                                                          ))
+//                                                      )
+//                                                 )
+//                                                 rhs:add
+//                                              )
+//                                              args:(ArgList
+//                                                    (Arg name:name value:"args")
+//                                                    (Arg name:value value:(Call
+//                                                          function:(Member
+//                                                              lhs:(Call
+//                                                                      function:(Member
+//                                                                         lhs:(New
+//                                                                              type:ASTBuilder
+//                                                                              args:(ArgList (Arg name:value value:"Arg"))
+//                                                                         )
+//                                                                         rhs:add
+//                                                                      )
+//                                                                      args:(ArgList
+//                                                                         (Arg name:name value:"name")
+//                                                                         (Arg name:value value:(Call
+//                                                                              function:(Member
+//                                                                                 lhs:AST
+//                                                                                 rhs:STRLit
+//                                                                              )
+//                                                                              args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                         ))
+//                                                                      )
+//                                                              )
+//                                                              rhs:add
+//                                                          )
+//                                                          args:(ArgList
+//                                                             (Arg name:name value:"value")
+//                                                             (Arg name:value value:(Call
+//                                                                     function:(Member
+//                                                                         lhs:(Call
+//                                                                             function:(Member
+//                                                                                 lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                           (Arg name:name value:"Call")
+//                                                                                     ))
+//                                                                                 rhs:add
+//                                                                             )
+//                                                                             args:(ArgList
+//                                                                                 (Arg name:name value:"function")
+//                                                                                 (Arg name:value value:(Call
+//                                                                                    function:(Member
+//                                                                                        lhs:(Call
+//                                                                                            function:(Member
+//                                                                                                lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                                          (Arg name:name value:"Member")
+//                                                                                                    ))
+//                                                                                                rhs:add
+//                                                                                            )
+//                                                                                            args:(ArgList
+//                                                                                                (Arg name:name value:"lhs")
+//                                                                                                (Arg name:value value:(Call
+//                                                                                                    function:(Member lhs:AST rhs:IDLit)
+//                                                                                                    args:(ArgList (Arg name:value value:"bQue"))
+//                                                                                                ))
+//                                                                                            )
+//                                                                                        )
+//                                                                                        rhs:add
+//                                                                                    )
+//                                                                                    args:(ArgList
+//                                                                                       (Arg name:name value:"rhs")
+//                                                                                       (Arg name:value value:(Call
+//                                                                                          function:(Member lhs:AST rhs:IDLit)
+//                                                                                          args:(ArgList (Arg name:value value:"pop"))
+//                                                                                       ))
+//                                                                                    )
+//                                                                                 ))
+//                                                                             )
+//                                                                         )
+//                                                                         rhs:add
+//                                                                     )
+//                                                                     args:(ArgList
+//                                                                        (Arg name:name value:"args")
+//                                                                        (Arg name:value value:(New
+//                                                                              type:ASTBuilder
+//                                                                              args:(ArgList (Arg name:value value:"ArgList"))
+//
+//                                                                        ))
+//                                                                     )
+//                                                             ))
+//
+//                                                          )
+//                                                    ))
+//                                              )
+//                                        ))
+//                                     )
+//                               ))
+//                            )
+//                        ))
+//                   ))
+//              ))
+
+                           .create())
+                .add("otherwise",
+                    new ASTBuilder("Block")
+                        .add(new ASTBuilder("If")
+                            .add("cond",
+                                new ASTBuilder("Call")
+                                    .add("function",
+                                        new ASTBuilder("Member")
+                                            .add("lhs", AST.IDLit("ast"))
+                                            .add("rhs", AST.IDLit("isList"))
+                                            .create())
+                                    .add("args", AST.emptyList("ArgList"))
+                                    .create())
+                            .add("code",
+                                new ASTBuilder("Block")
+
+
+                                    .create())
+                            .add("otherwise",
+                                new ASTBuilder("Block")
+
+
+                                    .create()))
+                        .create())
+                .create())
+            .create());
+//           (If cond:(isMember) code:(Block
+
+//           ) otherwise:(Block
+//               (If cond:(isList) code:(Block
+//                  (Call function:(Member lhs:builder rhs:setName) args:(ArgList (Arg name:name value:"List")))
+//
+//                  (For var:(Define name:child type:AST) expr:(Call function:(Member lhs:ast rhs:getMemberList) args:(ArgList)) code:(Block
+//                     (Assign lhs:child rhs:(Call function:expand args:(ArgList (Arg name:ast value:child))))
+//                     (If cond:(Neq lhs:child rhs:null) code:(Block
+//                          (Call function:(Member lhs:members rhs:add) args:(ArgList (Arg name:value value:child)))
+//                     ))
+//                  ))
+//                  (Call function:(Member lhs:Collections rhs:reverse) args:(ArgList (Arg name:lst value:members)))
+//                  (For var:(Define name:child type:AST) expr:members code:(Block
+//                      (Call function:(Member lhs:builder rhs:add) args:(ArgList (Arg name:value value:child)))
+//                  ))
+//                  (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                       (Arg name:ast value:(Call
+//                          function:(Member
+//                              lhs:(Call
+//                                  function:(Member
+//                                      lhs:(New type:ASTBuilder args:(ArgList
+//                                                (Arg name:name value:"Assign")
+//                                          ))
+//                                      rhs:add
+//                                  )
+//                                  args:(ArgList
+//                                      (Arg name:name value:"lhs")
+//                                      (Arg name:value value:(Call
+//                                          function:(Member lhs:AST rhs:IDLit)
+//                                          args:(ArgList (Arg name:value value:"builder"))
+//                                      ))
+//                                  )
+//                              )
+//                              rhs:add
+//                          )
+//                          args:(ArgList
+//                             (Arg name:name value:"rhs")
+//                             (Arg name:value value:(Call
+//                                function:(Member
+//                                   lhs:(Call
+//                                       function:(Member
+//                                           lhs:(New type:ASTBuilder args:(ArgList
+//                                                  (Arg name:name value:"New")
+//                                           ))
+//                                           rhs:add
+//                                       )
+//                                       args:(ArgList
+//                                          (Arg name:name value:"type")
+//                                          (Arg name:value value:(Call
+//                                              function:(Member lhs:AST rhs:IDLit)
+//                                              args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                          ))
+//                                       )
+//                                   )
+//                                   rhs:add
+//                                )
+//                                args:(ArgList
+//                                    (Arg name:name value:"args")
+//                                    (Arg name:value value:(Call
+//                                          function:(Member
+//                                             lhs:(New
+//                                                  type:ASTBuilder
+//                                                  args:(ArgList (Arg name:value value:"ArgList"))
+//                                             )
+//                                             rhs:add
+//                                          )
+//                                          args:(ArgList
+//                                             (Arg name:ast value:(Call
+//                                                   function:(Member
+//                                                      lhs:(Call
+//                                                          function:(Member
+//                                                              lhs:(New type:ASTBuilder args:(ArgList
+//                                                                     (Arg name:name value:"New")
+//                                                              ))
+//                                                              rhs:add
+//                                                          )
+//                                                          args:(ArgList
+//                                                             (Arg name:name value:"type")
+//                                                             (Arg name:value value:(Call
+//                                                                 function:(Member lhs:AST rhs:IDLit)
+//                                                                 args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                             ))
+//                                                          )
+//                                                      )
+//                                                      rhs:add
+//                                                   )
+//                                                   args:(ArgList
+//                                                       (Arg name:name value:"args")
+//                                                       (Arg name:value value:(Call
+//                                                             function:(Member
+//                                                                 lhs:(Call
+//                                                                         function:(Member
+//                                                                            lhs:(New
+//                                                                                 type:ASTBuilder
+//                                                                                 args:(ArgList (Arg name:value value:"Arg"))
+//                                                                            )
+//                                                                            rhs:add
+//                                                                         )
+//                                                                         args:(ArgList
+//                                                                            (Arg name:name value:"name")
+//                                                                            (Arg name:value value:(Call
+//                                                                                 function:(Member
+//                                                                                    lhs:AST
+//                                                                                    rhs:STRLit
+//                                                                                 )
+//                                                                                 args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                            ))
+//                                                                         )
+//                                                                 )
+//                                                                 rhs:add
+//                                                             )
+//                                                             args:(ArgList
+//                                                                (Arg name:name value:"value")
+//                                                                (Arg name:value value:(Call
+//                                                                     function:(Member
+//                                                                        lhs:AST
+//                                                                        rhs:STRLit
+//                                                                     )
+//                                                                     args:(ArgList
+//                                                                       (Arg name:value value:(Call
+//                                                                          function:(Member
+//                                                                             lhs:ast
+//                                                                             rhs:getTypeName
+//                                                                          )
+//                                                                          args:(ArgList)
+//                                                                       ))
+//                                                                     )
+//                                                                ))
+//                                                             )
+//                                                       ))
+//                                                   )
+//                                             ))
+//                                          )
+//                                    ))
+//                                )
+//                             ))
+//                          )
+//                       ))
+//                  ))
+//                  (For var:(Define name:ignored type:AST) expr:members code:(Block
+//                       (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                            (Arg name:ast value:(Call
+//                                function:(Member
+//                                    lhs:(Call
+//                                        function:(Member
+//                                            lhs:(New type:ASTBuilder args:(ArgList
+//                                                      (Arg name:name value:"Call")
+//                                                ))
+//                                            rhs:add
+//                                        )
+//                                        args:(ArgList
+//                                            (Arg name:name value:"function")
+//                                            (Arg name:value value:(Call
+//                                               function:(Member
+//                                                   lhs:(Call
+//                                                       function:(Member
+//                                                           lhs:(New type:ASTBuilder args:(ArgList
+//                                                                     (Arg name:name value:"Member")
+//                                                               ))
+//                                                           rhs:add
+//                                                       )
+//                                                       args:(ArgList
+//                                                           (Arg name:name value:"lhs")
+//                                                           (Arg name:value value:(Call
+//                                                               function:(Member lhs:AST rhs:IDLit)
+//                                                               args:(ArgList (Arg name:value value:"builder"))
+//                                                           ))
+//                                                       )
+//                                                   )
+//                                                   rhs:add
+//                                               )
+//                                               args:(ArgList
+//                                                  (Arg name:name value:"rhs")
+//                                                  (Arg name:value value:(Call
+//                                                     function:(Member lhs:AST rhs:IDLit)
+//                                                     args:(ArgList (Arg name:value value:"add"))
+//                                                  ))
+//                                               )
+//                                            ))
+//                                        )
+//                                    )
+//                                    rhs:add
+//                                )
+//                                args:(ArgList
+//                                   (Arg name:name value:"args")
+//                                   (Arg name:value value:(Call
+//                                         function:(Member
+//                                            lhs:(New
+//                                                 type:ASTBuilder
+//                                                 args:(ArgList (Arg name:value value:"ArgList"))
+//                                            )
+//                                            rhs:add
+//                                         )
+//                                         args:(ArgList
+//                                            (Arg name:ast value:(Call
+//                                                  function:(Member
+//                                                     lhs:(Call
+//                                                         function:(Member
+//                                                             lhs:(New type:ASTBuilder args:(ArgList
+//                                                                    (Arg name:name value:"New")
+//                                                             ))
+//                                                             rhs:add
+//                                                         )
+//                                                         args:(ArgList
+//                                                            (Arg name:name value:"type")
+//                                                            (Arg name:value value:(Call
+//                                                                function:(Member lhs:AST rhs:IDLit)
+//                                                                args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                            ))
+//                                                         )
+//                                                     )
+//                                                     rhs:add
+//                                                  )
+//                                                  args:(ArgList
+//                                                      (Arg name:name value:"args")
+//                                                      (Arg name:value value:(Call
+//                                                            function:(Member
+//                                                                lhs:(Call
+//                                                                        function:(Member
+//                                                                           lhs:(New
+//                                                                                type:ASTBuilder
+//                                                                                args:(ArgList (Arg name:value value:"Arg"))
+//                                                                           )
+//                                                                           rhs:add
+//                                                                        )
+//                                                                        args:(ArgList
+//                                                                           (Arg name:name value:"name")
+//                                                                           (Arg name:value value:(Call
+//                                                                                function:(Member
+//                                                                                   lhs:AST
+//                                                                                   rhs:STRLit
+//                                                                                )
+//                                                                                args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                           ))
+//                                                                        )
+//                                                                )
+//                                                                rhs:add
+//                                                            )
+//                                                            args:(ArgList
+//                                                               (Arg name:name value:"value")
+//                                                               (Arg name:value value:(ArgList
+//                                                                   (Arg name:ast value:(Call
+//                                                                       function:(Member
+//                                                                           lhs:(Call
+//                                                                               function:(Member
+//                                                                                   lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                             (Arg name:name value:"Call")
+//                                                                                       ))
+//                                                                                   rhs:add
+//                                                                               )
+//                                                                               args:(ArgList
+//                                                                                   (Arg name:name value:"function")
+//                                                                                   (Arg name:value value:(Call
+//                                                                                      function:(Member
+//                                                                                          lhs:(Call
+//                                                                                              function:(Member
+//                                                                                                  lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                                            (Arg name:name value:"Member")
+//                                                                                                      ))
+//                                                                                                  rhs:add
+//                                                                                              )
+//                                                                                              args:(ArgList
+//                                                                                                  (Arg name:name value:"lhs")
+//                                                                                                  (Arg name:value value:(Call
+//                                                                                                      function:(Member lhs:AST rhs:IDLit)
+//                                                                                                      args:(ArgList (Arg name:value value:"bQue"))
+//                                                                                                  ))
+//                                                                                              )
+//                                                                                          )
+//                                                                                          rhs:add
+//                                                                                      )
+//                                                                                      args:(ArgList
+//                                                                                         (Arg name:name value:"rhs")
+//                                                                                         (Arg name:value value:(Call
+//                                                                                            function:(Member lhs:AST rhs:IDLit)
+//                                                                                            args:(ArgList (Arg name:value value:"pop"))
+//                                                                                         ))
+//                                                                                      )
+//                                                                                   ))
+//                                                                               )
+//                                                                           )
+//                                                                           rhs:add
+//                                                                       )
+//                                                                       args:(ArgList
+//                                                                          (Arg name:name value:"args")
+//                                                                          (Arg name:value value:(New
+//                                                                                type:ASTBuilder
+//                                                                                args:(ArgList (Arg name:value value:"ArgList"))
+//
+//                                                                          ))
+//                                                                       )
+//                                                                   ))
+//                                                              ))
+//                                                            )
+//                                                      ))
+//                                                  )
+//                                            ))
+//                                         )
+//                                   ))
+//                                )
+//                            ))
+//                       ))
+//                  ))
+//               ) otherwise:(Block
+//                  (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                       (Arg name:ast value:(Call
+//                          function:(Member
+//                              lhs:(Call
+//                                  function:(Member
+//                                      lhs:(New type:ASTBuilder args:(ArgList
+//                                                (Arg name:name value:"Assign")
+//                                          ))
+//                                      rhs:add
+//                                  )
+//                                  args:(ArgList
+//                                      (Arg name:name value:"lhs")
+//                                      (Arg name:value value:(Call
+//                                          function:(Member lhs:AST rhs:IDLit)
+//                                          args:(ArgList (Arg name:value value:"builder"))
+//                                      ))
+//                                  )
+//                              )
+//                              rhs:add
+//                          )
+//                          args:(ArgList
+//                             (Arg name:name value:"rhs")
+//                             (Arg name:value value:(Call
+//                                function:(Member
+//                                   lhs:(Call
+//                                       function:(Member
+//                                           lhs:(New type:ASTBuilder args:(ArgList
+//                                                  (Arg name:name value:"New")
+//                                           ))
+//                                           rhs:add
+//                                       )
+//                                       args:(ArgList
+//                                          (Arg name:name value:"type")
+//                                          (Arg name:value value:(Call
+//                                              function:(Member lhs:AST rhs:IDLit)
+//                                              args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                          ))
+//                                       )
+//                                   )
+//                                   rhs:add
+//                                )
+//                                args:(ArgList
+//                                    (Arg name:name value:"args")
+//                                    (Arg name:value value:(Call
+//                                          function:(Member
+//                                             lhs:(New
+//                                                  type:ASTBuilder
+//                                                  args:(ArgList (Arg name:value value:"ArgList"))
+//                                             )
+//                                             rhs:add
+//                                          )
+//                                          args:(ArgList
+//                                             (Arg name:ast value:(Call
+//                                                   function:(Member
+//                                                      lhs:(Call
+//                                                          function:(Member
+//                                                              lhs:(New type:ASTBuilder args:(ArgList
+//                                                                     (Arg name:name value:"New")
+//                                                              ))
+//                                                              rhs:add
+//                                                          )
+//                                                          args:(ArgList
+//                                                             (Arg name:name value:"type")
+//                                                             (Arg name:value value:(Call
+//                                                                 function:(Member lhs:AST rhs:IDLit)
+//                                                                 args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                             ))
+//                                                          )
+//                                                      )
+//                                                      rhs:add
+//                                                   )
+//                                                   args:(ArgList
+//                                                       (Arg name:name value:"args")
+//                                                       (Arg name:value value:(Call
+//                                                             function:(Member
+//                                                                 lhs:(Call
+//                                                                         function:(Member
+//                                                                            lhs:(New
+//                                                                                 type:ASTBuilder
+//                                                                                 args:(ArgList (Arg name:value value:"Arg"))
+//                                                                            )
+//                                                                            rhs:add
+//                                                                         )
+//                                                                         args:(ArgList
+//                                                                            (Arg name:name value:"name")
+//                                                                            (Arg name:value value:(Call
+//                                                                                 function:(Member
+//                                                                                    lhs:AST
+//                                                                                    rhs:STRLit
+//                                                                                 )
+//                                                                                 args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                            ))
+//                                                                         )
+//                                                                 )
+//                                                                 rhs:add
+//                                                             )
+//                                                             args:(ArgList
+//                                                                (Arg name:name value:"value")
+//                                                                (Arg name:value value:(Call
+//                                                                     function:(Member
+//                                                                        lhs:AST
+//                                                                        rhs:STRLit
+//                                                                     )
+//                                                                     args:(ArgList
+//                                                                       (Arg name:value value:(Call
+//                                                                          function:(Member
+//                                                                             lhs:ast
+//                                                                             rhs:getTypeName
+//                                                                          )
+//                                                                          args:(ArgList)
+//                                                                       ))
+//                                                                     )
+//                                                                ))
+//                                                             )
+//                                                       ))
+//                                                   )
+//                                             ))
+//                                          )
+//                                    ))
+//                                )
+//                             ))
+//                          )
+//                       ))
+//                  ))
+//                  (Call function:(Member lhs:builder rhs:add) args:(ArgList
+//                        (Arg name:ast value:(Call
+//                            function:(Member
+//                                lhs:(Call
+//                                    function:(Member
+//                                        lhs:(New type:ASTBuilder args:(ArgList
+//                                                  (Arg name:name value:"Call")
+//                                            ))
+//                                        rhs:add
+//                                    )
+//                                    args:(ArgList
+//                                        (Arg name:name value:"function")
+//                                        (Arg name:value value:(Call
+//                                           function:(Member
+//                                               lhs:(Call
+//                                                   function:(Member
+//                                                       lhs:(New type:ASTBuilder args:(ArgList
+//                                                                 (Arg name:name value:"Member")
+//                                                           ))
+//                                                       rhs:add
+//                                                   )
+//                                                   args:(ArgList
+//                                                       (Arg name:name value:"lhs")
+//                                                       (Arg name:value value:(Call
+//                                                           function:(Member lhs:AST rhs:IDLit)
+//                                                           args:(ArgList (Arg name:value value:"builder"))
+//                                                       ))
+//                                                   )
+//                                               )
+//                                               rhs:add
+//                                           )
+//                                           args:(ArgList
+//                                              (Arg name:name value:"rhs")
+//                                              (Arg name:value value:(Call
+//                                                 function:(Member lhs:AST rhs:IDLit)
+//                                                 args:(ArgList (Arg name:value value:"set"))
+//                                              ))
+//                                           )
+//                                        ))
+//                                    )
+//                                )
+//                                rhs:add
+//                            )
+//                            args:(ArgList
+//                               (Arg name:name value:"args")
+//                               (Arg name:value value:(Call
+//                                     function:(Member
+//                                        lhs:(New
+//                                             type:ASTBuilder
+//                                             args:(ArgList (Arg name:value value:"ArgList"))
+//                                        )
+//                                        rhs:add
+//                                     )
+//                                     args:(ArgList
+//                                        (Arg name:ast value:(Call
+//                                              function:(Member
+//                                                 lhs:(Call
+//                                                     function:(Member
+//                                                         lhs:(New type:ASTBuilder args:(ArgList
+//                                                                (Arg name:name value:"New")
+//                                                         ))
+//                                                         rhs:add
+//                                                     )
+//                                                     args:(ArgList
+//                                                        (Arg name:name value:"type")
+//                                                        (Arg name:value value:(Call
+//                                                            function:(Member lhs:AST rhs:IDLit)
+//                                                            args:(ArgList (Arg name:value value:"ASTBuilder"))
+//                                                        ))
+//                                                     )
+//                                                 )
+//                                                 rhs:add
+//                                              )
+//                                              args:(ArgList
+//                                                  (Arg name:name value:"args")
+//                                                  (Arg name:value value:(Call
+//                                                        function:(Member
+//                                                            lhs:(Call
+//                                                                    function:(Member
+//                                                                       lhs:(New
+//                                                                            type:ASTBuilder
+//                                                                            args:(ArgList (Arg name:value value:"Arg"))
+//                                                                       )
+//                                                                       rhs:add
+//                                                                    )
+//                                                                    args:(ArgList
+//                                                                       (Arg name:name value:"name")
+//                                                                       (Arg name:value value:(Call
+//                                                                            function:(Member
+//                                                                               lhs:AST
+//                                                                               rhs:STRLit
+//                                                                            )
+//                                                                            args:(ArgList (Arg name:name value:"name"))
+//
+//                                                                       ))
+//                                                                    )
+//                                                            )
+//                                                            rhs:add
+//                                                        )
+//                                                        args:(ArgList
+//                                                           (Arg name:name value:"value")
+//                                                           (Arg name:value value:(ArgList
+//                                                               (Arg name:ast value:(Call
+//                                                                   function:(Member
+//                                                                       lhs:(Call
+//                                                                           function:(Member
+//                                                                               lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                         (Arg name:name value:"Call")
+//                                                                                   ))
+//                                                                               rhs:add
+//                                                                           )
+//                                                                           args:(ArgList
+//                                                                               (Arg name:name value:"function")
+//                                                                               (Arg name:value value:(Call
+//                                                                                  function:(Member
+//                                                                                      lhs:(Call
+//                                                                                          function:(Member
+//                                                                                              lhs:(New type:ASTBuilder args:(ArgList
+//                                                                                                        (Arg name:name value:"Member")
+//                                                                                                  ))
+//                                                                                              rhs:add
+//                                                                                          )
+//                                                                                          args:(ArgList
+//                                                                                              (Arg name:name value:"lhs")
+//                                                                                              (Arg name:value value:(Call
+//                                                                                                  function:(Member lhs:AST rhs:IDLit)
+//                                                                                                  args:(ArgList (Arg name:value value:"ast"))
+//                                                                                              ))
+//                                                                                          )
+//                                                                                      )
+//                                                                                      rhs:add
+//                                                                                  )
+//                                                                                  args:(ArgList
+//                                                                                     (Arg name:name value:"rhs")
+//                                                                                     (Arg name:value value:(Call
+//                                                                                        function:(Member lhs:AST rhs:IDLit)
+//                                                                                        args:(ArgList (Arg name:value value:"getValue"))
+//                                                                                     ))
+//                                                                                  )
+//                                                                               ))
+//                                                                           )
+//                                                                       )
+//                                                                       rhs:add
+//                                                                   )
+//                                                                   args:(ArgList
+//                                                                      (Arg name:name value:"args")
+//                                                                      (Arg name:value value:(New
+//                                                                            type:ASTBuilder
+//                                                                            args:(ArgList (Arg name:value value:"ArgList"))
+//
+//                                                                      ))
+//                                                                   )
+//                                                               ))
+//                                                          ))
+//                                                        )
+//                                                  ))
+//                                              )
+//                                        ))
+//                                     )
+//                               ))
+//                            )
+//                        ))
+//                   ))
+//           ))))
+//        ))
+    methodListExpansions.add(defaultBlock.create());
+
 
     methodList.add(
             new ASTBuilder("Method")
