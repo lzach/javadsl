@@ -1,6 +1,7 @@
 package dsl.translators.impl;
 
 import dsl.ast.AST;
+import dsl.ast.InvalidAstException;
 import dsl.translators.StringTranslator;
 
 public class JavaTranslator implements StringTranslator {
@@ -57,7 +58,7 @@ public class JavaTranslator implements StringTranslator {
       case "Call":
         return translate(ast.get("function")) + "(" + translate(ast.get("args"), "ArgList") + ")";
       case "Method":
-        return "public " + translate(ast.get("returnType")) + " " + translate(ast.get("name")) + "(" +  translate(ast.get("params"), "ParamList") + ") " + translate(ast.get("code"));
+        return "public " + translate(ast.get("returnType")) + " " + translate(ast.get("name")) + "(" +  translate(ast.get("params"), "ParamList") + ") {\n" + translate(ast.get("code")) + "\n}\n";
       case "Constructor":
         // NOTE: we can't translate constructors outside of the Class node, as we require the name of the class to do it
 	      return " ";
@@ -70,11 +71,10 @@ public class JavaTranslator implements StringTranslator {
         return translate(ast.get("value"));
       case "ParamList":
       case "ArgList":
-      	//HACK: Dirty trick to get type enforcing working for now:
-//        if ( !ast.isList() ) {
-//                return translate(ast);
-//        }
         // TODO: here we need to make sure the arguments/params end up in the right order.
+        if (ast.getMemberList() == null ) {
+          throw new InvalidAstException("Should be list ast");
+        }
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
             str += translate(child) + ",";
@@ -137,24 +137,38 @@ public class JavaTranslator implements StringTranslator {
         str = "{\n";
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
-            str += translate(child) + ";\n";
+            str += translate(child);
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For") ) {
+              str += ";\n";
+            }
           }
         }
         return str + "}\n";
       case "List":
         if ( ast.isList() && ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
-            str += translate(child) + ";\n";
+            str += translate(child);
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For") ) {
+              str += ";\n";
+            }
           }
         }
         if ( str.length() > 0 ) {
-                str = str.substring(0, str.length() - 1);
+            str = str.substring(0, str.length() - 1);
         }
         return str;
       case "Eq":
         return "Objects.equals(" + translate(ast.get("lhs")) + ", " + translate(ast.get("rhs")) + ")";
       case "Neq":
         return translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs"));
+      case "Lt":
+        return translate(ast.get("lhs")) + "<" + translate(ast.get("rhs"));
+      case "Gt":
+        return translate(ast.get("lhs")) + ">" + translate(ast.get("rhs"));
+      case "Lte":
+        return translate(ast.get("lhs")) + "<=" + translate(ast.get("rhs"));
+      case "Gte":
+        return translate(ast.get("lhs")) + ">=" + translate(ast.get("rhs"));
       case "Add":
         return translate(ast.get("lhs")) + "+" + translate(ast.get("rhs"));
       case "Sub":
@@ -163,6 +177,14 @@ public class JavaTranslator implements StringTranslator {
         return translate(ast.get("lhs")) + "*" + translate(ast.get("rhs"));
       case "Div":
         return translate(ast.get("lhs")) + "/" + translate(ast.get("rhs"));
+      case "Inc":
+        return "++(" + translate(ast.get("value")) + ")";
+      case "PostInc":
+        return "(" + translate(ast.get("value")) + ")++";
+      case "Dec":
+        return "--(" + translate(ast.get("value")) + ")";
+      case "PostDec":
+        return "(" + translate(ast.get("value")) + ")--";
       case "IntLit":
         return ast.getValue().toString();
       case "IDLit":

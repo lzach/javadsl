@@ -260,45 +260,6 @@ public abstract class Expansion {
                   .create()));
     } else {
       assert ast.getValue() != null;
-//            builder = new ASTBuilder("List");
-//            builder.add(
-//                new ASTBuilder("Assign")
-//                    .add("lhs", AST.IDLit("builder"))
-//                    .add("rhs",
-//                        new ASTBuilder("New")
-//                            .add("type", AST.IDLit("ASTBuilder"))
-//                            .add("args",
-//                                new ASTBuilder("ArgList")
-//                                    .add(
-//                                        new ASTBuilder("Arg")
-//                                            .add("name", AST.IDLit("name"))
-//                                            .add("value",
-//                                                new ASTBuilder("String")
-//                                                    .add("value", AST.IDLit(ast.getTypeName()))
-//                                                    .create())
-//                                            .create())
-//                                    .create())
-//                            .create())
-//                    .create());
-//            builder.add(
-//                    new ASTBuilder("Call")
-//                        .add("function",
-//                            new ASTBuilder("Member")
-//                                .add("lhs", AST.IDLit("builder"))
-//                                .add("rhs", AST.IDLit("set"))
-//                                .create())
-//                        .add("args",
-//                            new ASTBuilder("ArgList")
-//                                .add(
-//                                    new ASTBuilder("Arg")
-//                                        .add("name", AST.IDLit("value"))
-//                                        .add("value",
-//                                            new ASTBuilder("String")
-//                                                .add("value", AST.IDLit(ast.getValue().toString()))
-//                                                .create())
-//                                        .create())
-//                                .create())
-//                        .create());
       return new ASTBuilder("Call")
           .add("function",
               new ASTBuilder("Member")
