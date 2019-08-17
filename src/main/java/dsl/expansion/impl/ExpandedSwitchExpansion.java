@@ -403,17 +403,11 @@ public class ExpandedSwitchExpansion extends Expansion {
         builder.setName("List");
         builder.add(new AST("Comment", ast));
         List<AST> parts = new ArrayList<>();
-        if ( ast.getMemberList()[0].isList() ) {
-          for (AST member : ast.getMemberList()) {
-            AST expansion = expand(member);
-            parts.add(expansion);
-          }
-        } else {
-          for (AST member : ast.getMemberList()) {
-            parts.add(expand(member));
-          }
+
+        for (AST member : ast.getMemberList()) {
+          parts.add(expand(member));
         }
-        Collections.reverse(parts);
+//        Collections.reverse(parts);
 
         builder.addAll(parts);
         builder.add(createDefineBuilder().create());
@@ -514,254 +508,9 @@ public class ExpandedSwitchExpansion extends Expansion {
           }
         }
         createPush(builder);
+
         break;
-      case "ast":
-        builder.setName("List");
-        List<String> members = new ArrayList<>();
-        List<AST> children = new ArrayList<>();
 
-        if ( ast.hasMember("members") ) {
-          for (AST child : ast.get("members").getMemberList()) {
-            children.add(expand(child.get("value")));
-            members.add(child.get("name").toString());
-          }
-        } else {
-          for (AST child : ast.get("list").getMemberList()) {
-            children.add(expand(child.get("value")));
-          }
-        }
-
-        Collections.reverse(children);
-        builder.addAll(children);
-
-        builder.add(expand(ast.get("name")));
-        builder.add(
-            createPushWithCreate(
-                createAssign(
-                    createASTCreate(AST.IDLit("IDLit"), AST.IDLit("builder")).create(),
-                    createNew(
-                        createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ASTBuilder")).create(),
-                        createArg("name",
-                            new ASTBuilder("Call")
-                                .add("function",
-                                    new ASTBuilder("Member")
-                                        .add("lhs", AST.IDLit("AST"))
-                                        .add("rhs", AST.IDLit("STRLit"))
-                                        .create())
-                                .add("args",
-                                    new ASTBuilder("ArgList")
-                                        .add(new ASTBuilder("Arg")
-                                            .add("name", AST.IDLit("string"))
-                                            .add("value",
-                                                new ASTBuilder("Call")
-                                                    .add("function",
-                                                        new ASTBuilder("Member")
-                                                            .add("lhs",
-                                                                new ASTBuilder("Call")
-                                                                    .add("function",
-                                                                        new ASTBuilder("Member")
-                                                                            .add("lhs", AST.IDLit("bQue"))
-                                                                            .add("rhs", AST.IDLit("pop"))
-                                                                            .create()
-                                                                    ).add("args", AST.emptyList("ArgList")
-                                                                ).create()
-                                                            ).add("rhs", AST.IDLit("toString"))
-                                                            .create()
-                                                    ).add("args", AST.emptyList("ArgList"))
-                                                    .create())
-                                            .create())
-                                        .create()
-                                ).create()
-                        ).create()
-                    ).create()
-                ).create()
-            ).create());
-        if ( ast.hasMember("members") ) {
-          for (String member : members) {
-            builder.add(
-                createPushWithCreate(
-                    createCall(
-                        createMember(
-                            createASTCreate(AST.IDLit("IDLit"), AST.IDLit("builder")).create(),
-                            createASTCreate(AST.IDLit("IDLit"), AST.IDLit("add")).create()
-                        ).create(),
-                        createArg("name", createSTRLit(member).create()).create(),
-                        createArg("value",
-                                  createCall(
-                                      createMember(
-                                          createASTCreate(AST.IDLit("IDLit"), AST.IDLit("bQue")).create(),
-                                          createASTCreate(AST.IDLit("IDLit"), AST.IDLit("pop")).create()
-                                      ).create()
-                                  ).create()
-                        ).create()
-                    ).create()
-                ).create());
-          }
-          builder.add(new ASTBuilder("Assign")
-              .add("lhs", AST.IDLit("builder"))
-              .add("rhs",
-                  new ASTBuilder("New")
-                      .add("type", AST.IDLit("ASTBuilder"))
-                      .add("args",
-                          new ASTBuilder("ArgList")
-                              .add(
-                                  new ASTBuilder("Arg")
-                                      .add("name", AST.IDLit("name"))
-                                      .add("value", AST.STRLit("List"))
-                                      .create())
-                              .create())
-                      .create()));
-          for (int ignored = 0; ignored < members.size()+1; ++ignored ) {
-                builder.add(
-                    new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", AST.IDLit("builder"))
-                                .add("rhs", AST.IDLit("add"))
-                                .create())
-                        .add("args",
-                            new ASTBuilder("ArgList")
-                                .add(
-                                    new ASTBuilder("Arg")
-                                        .add("name", AST.IDLit("value"))
-                                        .add("value",
-                                            new ASTBuilder("Convert")
-                                                .add("type", AST.IDLit("AST"))
-                                                .add("value", new ASTBuilder("Call")
-                                                    .add("function",
-                                                        new ASTBuilder("Member")
-                                                            .add("lhs", AST.IDLit("bQue"))
-                                                            .add("rhs", AST.IDLit("pop"))
-                                                            .create())
-                                                    .add("args", AST.emptyList("ArgList"))
-                                                    .create())
-                                                .create()
-                                        ).create()
-                                ).create())
-                        .create()
-                );
-          }
-          builder.add(
-              new ASTBuilder("Call")
-                  .add("function",
-                      new ASTBuilder("Member")
-                          .add("lhs", AST.IDLit("bQue"))
-                          .add("rhs", AST.IDLit("push"))
-                          .create())
-                  .add("args",
-                      new ASTBuilder("ArgList")
-                          .add(
-                              new ASTBuilder("Arg")
-                                  .add("name", AST.IDLit("value"))
-                                   .add("value",
-                                      new ASTBuilder("Call")
-                                          .add("function",
-                                              new ASTBuilder("Member")
-                                                  .add("lhs", AST.IDLit("builder"))
-                                                  .add("rhs", AST.IDLit("create"))
-                                                  .create())
-                                          .add("args", AST.emptyList("ArgList"))
-                                          .create()
-                                  ).create()
-                          ).create())
-                  .create()
-          );
-        } else {
-            for (int ignored = 0; ignored < children.size(); ++ignored ) {
-                builder.add(
-                    createPushWithCreate(
-                        createCall(
-                            createMember(
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("builder")).create(),
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("add")).create()
-                            ).create(),
-                            createArg("value", new ASTBuilder("Convert")
-                                .add("type", AST.IDLit("AST"))
-                                .add("value",
-                                    new ASTBuilder("Call")
-                                        .add("function",
-                                            new ASTBuilder("Member")
-                                                .add("lhs", AST.IDLit("bQue"))
-                                                .add("rhs", AST.IDLit("pop"))
-                                                .create())
-                                        .add("args", AST.emptyList("ArgList"))
-                                        .create()
-                                ).create()
-                            ).create()
-                        ).create()
-                    ).create());
-            }
-            builder.add(new ASTBuilder("Assign")
-                .add("lhs", AST.IDLit("builder"))
-                .add("rhs",
-                    new ASTBuilder("New")
-                        .add("type", AST.IDLit("ASTBuilder"))
-                        .add("args",
-                            new ASTBuilder("ArgList")
-                                .add(
-                                    new ASTBuilder("Arg")
-                                        .add("name", AST.IDLit("name"))
-                                        .add("value", AST.STRLit("List"))
-                                        .create())
-                                .create())
-                        .create()));
-            for (int ignored = 0; ignored < children.size()+1; ++ignored ) {
-                builder.add(
-                    new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", AST.IDLit("builder"))
-                                .add("rhs", AST.IDLit("add"))
-                                .create())
-                        .add("args",
-                            new ASTBuilder("ArgList")
-                                .add(
-                                    new ASTBuilder("Arg")
-                                        .add("name", AST.IDLit("value"))
-                                        .add("value",
-                                            new ASTBuilder("Convert")
-                                                .add("type", AST.IDLit("AST"))
-                                                .add("value", new ASTBuilder("Call")
-                                                    .add("function",
-                                                        new ASTBuilder("Member")
-                                                            .add("lhs", AST.IDLit("bQue"))
-                                                            .add("rhs", AST.IDLit("pop"))
-                                                            .create())
-                                                    .add("args", AST.emptyList("ArgList"))
-                                                    .create())
-                                                .create()
-                                        ).create()
-                                ).create())
-                        .create()
-                );
-            }
-            builder.add(
-                new ASTBuilder("Call")
-                    .add("function",
-                        new ASTBuilder("Member")
-                            .add("lhs", AST.IDLit("bQue"))
-                            .add("rhs", AST.IDLit("push"))
-                            .create())
-                    .add("args",
-                        new ASTBuilder("ArgList")
-                            .add(
-                                new ASTBuilder("Arg")
-                                    .add("name", AST.IDLit("value"))
-                                    .add("value",
-                                        new ASTBuilder("Call")
-                                            .add("function",
-                                                new ASTBuilder("Member")
-                                                    .add("lhs", AST.IDLit("builder"))
-                                                    .add("rhs", AST.IDLit("create"))
-                                                    .create())
-                                            .add("args", AST.emptyList("ArgList"))
-                                            .create()
-                                    ).create()
-                            ).create())
-                    .create()
-            );
-        }
-        break;
       case "callExpansion":
         return createPushWithCreate(createCall(
             new ASTBuilder("Call")
@@ -784,301 +533,7 @@ public class ExpandedSwitchExpansion extends Expansion {
                 createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create())
                 .create())
         .create()).create();
-      case "hasMember":
-        return createPushWithCreate(createCall(
-            new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs",
-                            createMember(
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create(),
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("hasMember")).create()
-                            ).create())
-                        .add("rhs", AST.IDLit("create"))
-                        .create())
-                .add("args",  new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", ast.get("name"))
-                        .create())
-                    .create())
-                .create()
 
-        ).create()).create();
-      case "isMember":
-       return createPushWithCreate(createCall(
-           new ASTBuilder("Call")
-               .add("function",
-                   new ASTBuilder("Member")
-                       .add("lhs",
-                           createMember(
-                               createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create(),
-                               createASTCreate(AST.IDLit("IDLit"), AST.IDLit("isMembers")).create()
-                           ).create())
-                       .add("rhs", AST.IDLit("create"))
-                       .create())
-               .add("args", AST.emptyList("ArgList"))
-               .create()
-
-       ).create()).create();
-      case "isList":
-        return createPushWithCreate(createCall(
-            new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs",
-                            createMember(
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create(),
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("isList")).create()
-                            ).create())
-                        .add("rhs", AST.IDLit("create"))
-                        .create())
-                .add("args", AST.emptyList("ArgList"))
-                .create()
-
-        ).create()).create();
-      case "isValue":
-        return createPushWithCreate(createCall(
-            new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs",
-                            createMember(
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create(),
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("isValue")).create()
-                            ).create())
-                        .add("rhs", AST.IDLit("create"))
-                        .create())
-                .add("args", AST.emptyList("ArgList"))
-                .create()
-        ).create()).create();
-      case "setValue":
-        return createPushWithCreate(createCall(
-            new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs",
-                            createMember(
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("builder")).create(),
-                                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("set")).create()
-                            ).create())
-                        .add("rhs", AST.IDLit("create"))
-                        .create())
-                .add("args", AST.emptyList("ArgList"))
-                .create(),
-            createArg("name",
-                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("ast")).create())
-                .create()
-        ).create()).create();
-      case "push":
-        builder = (ASTBuilder) new ASTBuilder("List")
-            .add(new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs", AST.IDLit("bQue"))
-                        .add("rhs", AST.IDLit("push"))
-                        .create())
-                .add("args",
-                    new ASTBuilder("ArgList")
-                        .add(new ASTBuilder("Arg")
-                            .add("name", AST.IDLit("ast"))
-                            .add("value",
-                                new ASTBuilder("Call")
-                                    .add("function",
-                                        new ASTBuilder("Member")
-                                            .add("lhs",
-                                                new ASTBuilder("New")
-                                                    .add("type", AST.IDLit("ASTBuilder"))
-                                                    .add("args",
-                                                        new ASTBuilder("ArgList")
-                                                            .add(new ASTBuilder("Arg")
-                                                                .add("name", AST.IDLit("name"))
-                                                                .add("value", AST.STRLit("List"))
-                                                                .create())
-                                                            .create())
-                                                    .create())
-                                            .add("rhs", AST.IDLit("create"))
-                                            .create())
-                                    .add("args", AST.emptyList("ArgList"))
-                                    .create())
-                            .create())
-                        .create())
-                .create())
-            .add(expand(ast.get("value")))
-            .add(createDefineBuilder(new ASTBuilder("Convert")
-                .add("type", AST.IDLit("AST"))
-                .add("value",
-                    new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", AST.IDLit("bQue"))
-                                .add("rhs", AST.IDLit("pop"))
-                                .create())
-                        .add("args", AST.emptyList("ArgList"))
-                        .create()).create()))
-            .add(new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs", AST.IDLit("bQue"))
-                        .add("rhs", AST.IDLit("push"))
-                        .create())
-                .add("args",
-                    new ASTBuilder("ArgList")
-                        .add(new ASTBuilder("Arg")
-                            .add("name", AST.IDLit("ast"))
-                            .add("value",
-
-                                new ASTBuilder("Call")
-                                    .add("function",
-                                        new ASTBuilder("Member")
-                                            .add("lhs",
-                                                new ASTBuilder("Call")
-                                                    .add("function",
-                                                        new ASTBuilder("Member")
-                                                            .add("lhs",
-                                                                new ASTBuilder("New")
-                                                                    .add("type", AST.IDLit("ASTBuilder"))
-                                                                    .add("args",
-                                                                        new ASTBuilder("ArgList")
-                                                                            .add(new ASTBuilder("Arg")
-                                                                                .add("name", AST.IDLit("ast"))
-                                                                                .add("value", new ASTBuilder("Convert")
-                                                                                    .add("type", AST.IDLit("AST"))
-                                                                                    .add("value",
-                                                                                        new ASTBuilder("Call")
-                                                                                            .add("function",
-                                                                                                new ASTBuilder("Member")
-                                                                                                    .add("lhs", AST.IDLit("bQue"))
-                                                                                                    .add("rhs", AST.IDLit("pop"))
-                                                                                                    .create())
-                                                                                            .add("args", AST.emptyList("ArgList"))
-                                                                                            .create())
-                                                                                    .create())
-                                                                                .create())
-                                                                            .create()                                                        )
-                                                                    .create())
-                                                            .add("rhs", AST.IDLit("add"))
-                                                            .create())
-                                                    .add("args",
-                                                        new ASTBuilder("ArgList")
-                                                              .add(new ASTBuilder("Arg")
-                                                                  .add("name", AST.IDLit("ast"))
-                                                                  .add("value",
-                                                                      new ASTBuilder("Call")
-                                                                          .add("function",
-                                                                              new ASTBuilder("Member")
-                                                                                  .add("lhs", AST.IDLit("builder"))
-                                                                                  .add("rhs", AST.IDLit("create"))
-                                                                                  .create())
-                                                                          .add("args", AST.emptyList("ArgList"))
-                                                                          .create())
-                                                                  .create())
-                                                             .create())
-                                                    .create())
-                                            .add("rhs", AST.IDLit("create"))
-                                            .create())
-                                    .add("args",  AST.emptyList("ArgList"))
-                                    .create())
-                            .create())
-                        .create())
-                .create())
-            .add(createPushWithCreate(createCall(
-                createCreate(
-                  createMember(
-                      createASTCreate(AST.IDLit("IDLit"), AST.IDLit("bQue")).create(),
-                      createASTCreate(AST.IDLit("IDLit"), AST.IDLit("push")).create())
-                ).create(),
-                createArg("value", createDeepCreate().create()).create())
-                .create()).create())
-            .add(createDefineBuilder(new ASTBuilder("Convert")
-                .add("type", AST.IDLit("AST"))
-                .add("value",
-                    new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", AST.IDLit("bQue"))
-                                .add("rhs", AST.IDLit("pop"))
-                                .create())
-                        .add("args", AST.emptyList("ArgList"))
-                        .create()).create()))
-            .add(new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs", AST.IDLit("bQue"))
-                        .add("rhs", AST.IDLit("push"))
-                        .create())
-                .add("args",
-                    new ASTBuilder("ArgList")
-                        .add(new ASTBuilder("Arg")
-                            .add("name", AST.IDLit("ast"))
-                            .add("value",
-
-                                new ASTBuilder("Call")
-                                    .add("function",
-                                        new ASTBuilder("Member")
-                                            .add("lhs",
-                                                new ASTBuilder("Call")
-                                                    .add("function",
-                                                        new ASTBuilder("Member")
-                                                            .add("lhs",
-                                                                new ASTBuilder("New")
-                                                                    .add("type", AST.IDLit("ASTBuilder"))
-                                                                    .add("args",
-                                                                        new ASTBuilder("ArgList")
-                                                                            .add(new ASTBuilder("Arg")
-                                                                                .add("name", AST.IDLit("ast"))
-                                                                                .add("value", new ASTBuilder("Convert")
-                                                                                    .add("type", AST.IDLit("AST"))
-                                                                                    .add("value",
-                                                                                        new ASTBuilder("Call")
-                                                                                            .add("function",
-                                                                                                new ASTBuilder("Member")
-                                                                                                    .add("lhs", AST.IDLit("bQue"))
-                                                                                                    .add("rhs", AST.IDLit("pop"))
-                                                                                                    .create())
-                                                                                            .add("args", AST.emptyList("ArgList"))
-                                                                                            .create())
-                                                                                    .create())
-                                                                                .create())
-                                                                            .create()                                                        )
-                                                                    .create())
-                                                            .add("rhs", AST.IDLit("add"))
-                                                            .create())
-                                                    .add("args",
-                                                        new ASTBuilder("ArgList")
-                                                            .add(new ASTBuilder("Arg")
-                                                                .add("name", AST.IDLit("ast"))
-                                                                .add("value",
-                                                                    new ASTBuilder("Call")
-                                                                        .add("function",
-                                                                            new ASTBuilder("Member")
-                                                                                .add("lhs", AST.IDLit("builder"))
-                                                                                .add("rhs", AST.IDLit("create"))
-                                                                                .create())
-                                                                        .add("args", AST.emptyList("ArgList"))
-                                                                        .create())
-                                                                .create())
-                                                            .create())
-                                                    .create())
-                                            .add("rhs", AST.IDLit("create"))
-                                            .create())
-                                    .add("args",  AST.emptyList("ArgList"))
-                                    .create())
-                            .create())
-                        .create())
-                .create());
-        break;
-      case "pop":
-        builder = (ASTBuilder) new ASTBuilder("List")
-//            .add(createBuilder("List").create())
-            .add(createPushWithCreate(createCall(
-                createCreate(
-                    createMember(
-                      createASTCreate(AST.IDLit("IDLit"), AST.IDLit("bQue")).create(),
-                      createASTCreate(AST.IDLit("IDLit"), AST.IDLit("pop")).create())
-                    ).create())
-                .create()).create());
-        break;
       case "expFunName":
         return new ASTBuilder("List")
             .add(expand(ast.get("type")))
@@ -1140,174 +595,6 @@ public class ExpandedSwitchExpansion extends Expansion {
     return builder.create();
   }
 
-  private ASTBuilder createDeepCreate() {
-    return createCall(
-        createCreate(
-            createMember(
-                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("bQue")).create(),
-                createASTCreate(AST.IDLit("IDLit"), AST.IDLit("pop")).create())
-        ).create());
-  }
-
-  private ASTBuilder createSTRLit(String str) {
-    return (ASTBuilder)new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", AST.IDLit("AST"))
-                .add("rhs", AST.IDLit("STRLit"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(new ASTBuilder("Arg")
-                    .add("name", AST.IDLit("value"))
-                    .add("value", new ASTBuilder("String")
-                        .add("value", AST.IDLit(str))
-                        .create())
-                    .create())
-                .create());
-  }
-
-  private ASTBuilder createAssign(AST lhs, AST rhs) {
-        ASTBuilder builder = (ASTBuilder) new ASTBuilder("New")
-            .add("type", AST.IDLit("ASTBuilder"))
-            .add("args",
-                new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", AST.STRLit("Assign"))
-                        .create())
-                    .create());
-        builder = (ASTBuilder)new ASTBuilder("Call")
-            .add("function",
-                new ASTBuilder("Member")
-                    .add("lhs", builder.create())
-                    .add("rhs", AST.IDLit("add"))
-                    .create())
-            .add("args",
-                new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", new ASTBuilder("String")
-                            .add("value", AST.IDLit("lhs"))
-                            .create())
-                        .create())
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", lhs)
-                        .create())
-                    .create());
-        builder = (ASTBuilder)new ASTBuilder("Call")
-            .add("function",
-                new ASTBuilder("Member")
-                    .add("lhs", builder.create())
-                    .add("rhs", AST.IDLit("add"))
-                    .create())
-            .add("args",
-                new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", new ASTBuilder("String")
-                            .add("value", AST.IDLit("rhs"))
-                            .create())
-                        .create())
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", rhs)
-                        .create())
-                    .create());
-        return builder;
-    }
-
-    private ASTBuilder createNew(AST type, AST ... args) {
-        ASTBuilder builder = (ASTBuilder) new ASTBuilder("New")
-                             .add("type", AST.IDLit("ASTBuilder"))
-                             .add("args",
-                                 new ASTBuilder("ArgList")
-                                     .add(new ASTBuilder("Arg")
-                                         .add("name", AST.IDLit("name"))
-                                         .add("value", AST.STRLit("New"))
-                                         .create())
-                                     .create());
-        builder = (ASTBuilder)new ASTBuilder("Call")
-          .add("function",
-              new ASTBuilder("Member")
-                  .add("lhs", builder.create())
-                  .add("rhs", AST.IDLit("add"))
-                  .create())
-          .add("args",
-              new ASTBuilder("ArgList")
-                  .add(new ASTBuilder("Arg")
-                      .add("name", AST.IDLit("name"))
-                      .add("value", new ASTBuilder("String")
-                          .add("value", AST.IDLit("type"))
-                          .create())
-                      .create())
-                  .add(new ASTBuilder("Arg")
-                      .add("name", AST.IDLit("name"))
-                      .add("value", type)
-                          .create())
-                      .create());
-        builder = (ASTBuilder)new ASTBuilder("Call")
-            .add("function",
-                new ASTBuilder("Member")
-                    .add("lhs", builder.create())
-                    .add("rhs", AST.IDLit("add"))
-                    .create())
-            .add("args",
-                new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", new ASTBuilder("String")
-                            .add("value", AST.IDLit("args"))
-                            .create())
-                        .create())
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", new ASTBuilder("Call")
-                            .add("function",
-                                new ASTBuilder("Member")
-                                    .add("lhs", createArgList(args).create())
-                                    .add("rhs", AST.IDLit("create"))
-                                    .create())
-                            .add("args", AST.emptyList("ArgList"))
-                            .create())
-                        .create())
-                    .create());
-        return builder;
-  }
-
-  private ASTBuilder createCreateCall(AST ast) {
-    return (ASTBuilder) new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", ast)
-                .add("rhs", AST.IDLit("create"))
-                .create())
-        .add("args", AST.emptyList("ArgList"));
-  }
-
-  private ASTBuilder createConvert(String type, AST ... args) {
-    return createConvert(
-        new ASTBuilder("Call")
-            .add("function",
-                new ASTBuilder("Member")
-                    .add("lhs", AST.IDLit("AST"))
-                    .add("rhs", AST.IDLit("IDLit"))
-                    .create()
-            ).add("args",
-                new ASTBuilder("ArgList")
-                    .add(new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("value"))
-                        .add("value",
-                            new ASTBuilder("String")
-                                .add("value", AST.IDLit(type))
-                                .create())
-                        .create())
-                    .create()
-            ).create(),
-        args);
-
-  }
 
   private ASTBuilder createASTCreate(AST lhs, AST rhs) {
     return (ASTBuilder)new ASTBuilder("Call")
@@ -1554,7 +841,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                                         .create())
                                     .add("block", methodListExpansions.create())
                                 .create())
-                            //.add(createReturnBuild().create())
                         .create())
                     .create());
     /* members name:expansions */
@@ -1613,71 +899,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .add("value", name)
                 .create())
             .create());
-  }
-
-  private ASTBuilder createConvert(AST type, AST ... args) {
-    ASTBuilder builder = (ASTBuilder) new ASTBuilder("New")
-        .add("type", AST.IDLit("ASTBuilder"))
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value",
-                            new ASTBuilder("String")
-                                .add("value", AST.IDLit("Convert"))
-                                .create())
-                        .create())
-                .create());
-    builder = (ASTBuilder)new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", builder.create())
-                .add("rhs", AST.IDLit("add"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value",
-                            new ASTBuilder("String")
-                                .add("value", AST.IDLit("type"))
-                                .create())
-                        .create())
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("value"))
-                        .add("value", type)
-                        .create())
-                .create());
-    builder = (ASTBuilder)new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", builder.create())
-                .add("rhs", AST.IDLit("add"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(new ASTBuilder("Arg")
-                    .add("name", AST.IDLit("name"))
-                    .add("value", new ASTBuilder("String")
-                        .add("value", AST.IDLit("args"))
-                        .create())
-                    .create())
-                .add(new ASTBuilder("Arg")
-                    .add("name", AST.IDLit("name"))
-                    .add("value", new ASTBuilder("Call")
-                        .add("function",
-                            new ASTBuilder("Member")
-                                .add("lhs", createArgList(args).create())
-                                .add("rhs", AST.IDLit("create"))
-                                .create())
-                        .add("args", AST.emptyList("ArgList"))
-                        .create())
-                    .create())
-                .create());
-    return builder;
   }
 
   private ASTBuilder createArg(String name, AST  arg) {
@@ -1747,24 +968,6 @@ public class ExpandedSwitchExpansion extends Expansion {
     return builder;
   }
 
-  private ASTBuilder createArg(AST arg) {
-    ASTBuilder builder = createBuilder("Arg");
-    builder = (ASTBuilder) new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", builder.create())
-                .add("rhs", AST.IDLit("add"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("value"))
-                        .add("value", arg)
-                        .create())
-                .create());
-    return builder;
-  }
 
   private ASTBuilder createArgList(AST ... args) {
     ASTBuilder builder = (ASTBuilder) new ASTBuilder("New")
@@ -1862,55 +1065,6 @@ public class ExpandedSwitchExpansion extends Expansion {
     return builder;
   }
 
-  private ASTBuilder createMember(AST lhs, AST rhs) {
-    ASTBuilder builder = createBuilder("Member");
-    builder = (ASTBuilder) new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", builder.create())
-                .add("rhs", AST.IDLit("add"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value",
-                            new ASTBuilder("String")
-                                .add("value", AST.IDLit("lhs"))
-                                .create())
-                        .create())
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("value"))
-                        .add("value", lhs)
-                        .create())
-                .create());
-    builder = (ASTBuilder) new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", builder.create())
-                .add("rhs", AST.IDLit("add"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value",
-                            new ASTBuilder("String")
-                                .add("value", AST.IDLit("rhs"))
-                                .create())
-                        .create())
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("value"))
-                        .add("value", rhs)
-                        .create())
-                .create());
-     return builder;
-  }
-
   private void createPush(ASTBuilder builder) {
      builder.add(createPush().create());
   }
@@ -1941,23 +1095,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                   .create());
   }
 
-  private ASTBuilder createPush(AST ast) {
-    return (ASTBuilder) new ASTBuilder("Call")
-        .add("function",
-            new ASTBuilder("Member")
-                .add("lhs", AST.IDLit("bQue"))
-                .add("rhs", AST.IDLit("push"))
-                .create())
-        .add("args",
-            new ASTBuilder("ArgList")
-                .add(
-                    new ASTBuilder("Arg")
-                        .add("name", AST.IDLit("name"))
-                        .add("value", ast)
-                        .create())
-                .create());
-  }
-
   private ASTBuilder createPushWithCreate(AST ast) {
     return (ASTBuilder) new ASTBuilder("Call")
         .add("function",
@@ -1983,9 +1120,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .create());
   }
 
-  private void createDefineBuilder(ASTBuilder builder) {
-    builder.add(createDefineBuilder().create());
-  }
   private ASTBuilder createDefineBuilder() {
     return (ASTBuilder)new ASTBuilder("Assign")
                     .add("lhs", AST.IDLit("builder"))
@@ -2012,32 +1146,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .create());
   }
 
-  private ASTBuilder createDefineBuilder(String name) {
-    return (ASTBuilder)new ASTBuilder("Assign")
-        .add("lhs", AST.IDLit("builder"))
-        .add("rhs",
-            new ASTBuilder("New")
-                .add("type", AST.IDLit("ASTBuilder"))
-                .add("args",  new ASTBuilder("ArgList")
-                    .add(
-                        new ASTBuilder("Arg")
-                            .add("name", AST.IDLit("name"))
-                            .add("value",
-                                new ASTBuilder("String")
-                                    .add("value", AST.IDLit(name))
-                                    .create())
-                            .create())
-                    .create())
-                .create());
-  }
-
-  private void createAssignBuilder(AST ast, ASTBuilder builder) {
-    builder.add(createAssignBuilder(ast).create());
-  }
-
-  private ASTBuilder createAssignBuilder(AST ast) {
-    return (ASTBuilder) createAssignBuilder(ast.getTypeName());
-  }
   private ASTBuilder createAssignBuilder(String name) {
     return (ASTBuilder) new ASTBuilder("Call")
         .add("function",
@@ -2058,26 +1166,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .create());
   }
 
-
-  private void createDefineAssignBuilder(AST ast, ASTBuilder builder) {
-     createDefineBuilder(builder);
-     createAssignBuilder(ast, builder);
-  }
-
-  private ASTBuilder createCreate(ASTBuilder builder) {
-    return (ASTBuilder) new ASTBuilder("Convert")
-        .add("type", AST.IDLit("AST"))
-        .add("value",
-            new ASTBuilder("Call")
-                .add("function",
-                    new ASTBuilder("Member")
-                        .add("lhs", builder.create())
-                        .add("rhs", AST.create("IDLit", "create"))
-                        .create())
-                .add("args", AST.emptyList("ArgList"))
-                .create());
-  }
-
   private ASTBuilder createCreate() {
     return (ASTBuilder) new ASTBuilder("Convert")
                 .add("type", AST.IDLit("AST"))
@@ -2094,7 +1182,6 @@ public class ExpandedSwitchExpansion extends Expansion {
 
 
   private ASTBuilder createAssignQue() {
-
     return (ASTBuilder)new ASTBuilder("Assign")
             .add("lhs",
                     new ASTBuilder("Define")
@@ -2122,46 +1209,21 @@ public class ExpandedSwitchExpansion extends Expansion {
                             .create());
   }
 
-  private ASTBuilder createDefineAssignQueBuilder() {
-    ASTBuilder builder = new ASTBuilder("List");
-    builder.add(createAssignQue().create());
-    builder.add(createDefineAssignEmptyBuilder().create());
-    return builder;
-  }
-
   private ASTBuilder createReturnBuild() {
 
-    return (ASTBuilder)new ASTBuilder("Return")
-            .add("value",
-                    new ASTBuilder("Call")
-                            .add("function",
-                                    new ASTBuilder("Member")
-                                            .add("lhs", AST.IDLit("builder"))
-                                            .add("rhs", AST.IDLit("create"))
-                                            .create())
-                            .add("args", AST.emptyList("ArgList"))
-                            .create());
-  }
-
-  private void createPopToBuilder(ASTBuilder builder) {
-    builder.add(createPopToBuilder().create());
-  }
-
-  private ASTBuilder createPopToBuilder() {
-    return (ASTBuilder)new ASTBuilder("Call")
-          .add("function",
-              new ASTBuilder("Member")
-                  .add("lhs", AST.IDLit("builder"))
-                  .add("rhs", AST.IDLit("add"))
-                  .create())
-          .add("args",
-              new ASTBuilder("ArgList")
-                  .add(
-                      new ASTBuilder("Arg")
-                          .add("name", AST.IDLit("ast"))
-                          .add("value", createCreate().create())
-                          .create())
-                  .create());
+      return (ASTBuilder)new ASTBuilder("Return")
+          .add("value", new ASTBuilder("Convert")
+              .add("type", AST.IDLit("AST"))
+              .add("value",
+                  new ASTBuilder("Call")
+                      .add("function",
+                          new ASTBuilder("Member")
+                              .add("lhs", AST.IDLit("bQue"))
+                              .add("rhs", AST.IDLit("pop"))
+                              .create())
+                      .add("args", AST.emptyList("ArgList"))
+                      .create())
+              .create());
   }
 
   private ASTBuilder createPopAllToBuilder() {
@@ -2176,19 +1238,17 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .add(
                     new ASTBuilder("Arg")
                         .add("name", AST.IDLit("ast"))
-                        .add("value",
-                            new ASTBuilder("Call")
-                                .add("function",
-                                    new ASTBuilder("Member")
-                                        .add("lhs", createCreate().create())
-                                        .add("rhs", AST.IDLit("getMemberList"))
-                                        .create())
-                                .add("args", AST.emptyList("ArgList"))
-                                .create())
+                        .add("value", new ASTBuilder("Call")
+                            .add("function",
+                                new ASTBuilder("Member")
+                                    .add("lhs", createCreate().create())
+                                    .add("rhs", AST.IDLit("getMemberList"))
+                                    .create())
+                            .add("args", AST.emptyList("ArgList"))
+                            .create())
                         .create())
                 .create());
   }
-
 
   private ASTBuilder createPushAST() {
       return (ASTBuilder)new ASTBuilder("Call")
@@ -2203,7 +1263,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                     .create());
   }
 
-
   private ASTBuilder createPopAST() {
     return (ASTBuilder)new ASTBuilder("Assign")
         .add("lhs", AST.IDLit("ast"))
@@ -2212,13 +1271,6 @@ public class ExpandedSwitchExpansion extends Expansion {
                 .add("function", AST.IDLit("popAST"))
                 .add("args", AST.emptyList("ArgList"))
                 .create());
-  }
-
-  private ASTBuilder createPop() {
-    return (ASTBuilder)
-            new ASTBuilder("Call")
-                .add("function", AST.IDLit("popAST"))
-                .add("args", AST.emptyList("ArgList"));
   }
 
   private ASTBuilder createPollAST() {

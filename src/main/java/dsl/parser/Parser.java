@@ -83,11 +83,13 @@ public class Parser {
       case NUM:
         if ( value.getValue().matches("[eE.]") ) {
           typ = "Float";
-          val = Float.parseFloat(value.getValue());
+//          val = Float.parseFloat(value.getValue());
         } else {
           typ = "Int";
-          val = Integer.parseInt(value.getValue());
+//          val = Integer.parseInt(value.getValue());
         }
+
+        val = value.getValue();
         break;
       case STR:
         typ = "String";

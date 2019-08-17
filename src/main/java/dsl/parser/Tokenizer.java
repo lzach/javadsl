@@ -18,7 +18,13 @@ public class Tokenizer {
     StringBuilder builder = new StringBuilder();
     int line = _line, col = _col;
     Token.Type type = null;
+    boolean literalVal = false;
     String c = next();
+    if ( c.equals("$") ) {
+      c = next();
+      literalVal = true;
+    }
+
     if ( c.matches("\\s") ) {
       type = Token.Type.WS;
       builder.append(c);
@@ -118,8 +124,9 @@ public class Tokenizer {
         builder.append(next());
       }
     }
+    String value = (literalVal ? "$" : "") + builder.toString();
 
-    return new Token(type, builder.toString(), line, col);
+    return new Token(type, value, line, col);
   }
 
   public Token get() {

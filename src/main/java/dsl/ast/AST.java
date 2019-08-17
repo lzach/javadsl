@@ -91,6 +91,9 @@ public class AST {
   }
 
   public static AST STRLit(String value) {
+      if (value.charAt(0) == '$' ) {
+        return new AST("$String", new Object[]{"value", IDLit(value)}, (Object[])null);
+      }
       return new AST("String", new Object[]{"value", IDLit(value)}, (Object[])null);
   }
 

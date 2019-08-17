@@ -115,6 +115,17 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   @Override
+  public ASTListBuilder add(int index, AST ast) {
+    if ( memberList == null ) {
+      createMemberList();
+    }
+    if ( ast != null ) {
+      memberList.add(index, ast);
+    }
+    return this;
+  }
+
+  @Override
   public ASTListBuilder addAll(Collection<AST> asts) {
     if ( memberList == null ) {
       createMemberList();
@@ -245,5 +256,13 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
 
   public Object getValue() {
     return value;
+  }
+
+  public int size() {
+    return members != null ? members.size() : (memberList != null ? memberList.size(): 0);
+  }
+
+  public List<AST> getList() {
+    return memberList;
   }
 }

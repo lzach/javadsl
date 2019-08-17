@@ -1,8 +1,11 @@
 package dsl.translators.impl;
 
 import dsl.ast.AST;
+import dsl.ast.ASTBuilder;
 import dsl.ast.InvalidAstException;
 import dsl.translators.StringTranslator;
+
+import java.util.Objects;
 
 public class JavaTranslator implements StringTranslator {
   @Override
@@ -145,7 +148,15 @@ public class JavaTranslator implements StringTranslator {
         }
         return str + "}\n";
       case "List":
+        AST delistify = delist(ast);
+        if (!Objects.equals(delistify.getTypeName(), "List")) {
+          return translate(delistify);
+        } else {
+          ast = delistify;
+        }
+
         if ( ast.isList() && ast.getMemberList().length > 0 ) {
+
           for (AST child : ast.getMemberList()) {
             str += translate(child);
             if ( !child.getTypeName().matches("Select|Class|Method|If|While|For") ) {
@@ -201,5 +212,23 @@ public class JavaTranslator implements StringTranslator {
 
     }
     return "";
+  }
+
+  private AST delist(AST ast) {
+    ASTBuilder builder = new ASTBuilder("List");
+    for ( AST child : ast.getMemberList() ) {
+      if (Objects.equals(child.getTypeName(), "List")) {
+        child = delist(child);
+      }
+      if (Objects.equals(child.getTypeName(), "List")) {
+        builder.addAll(child.getMemberList());
+      } else {
+        builder.add(child);
+      }
+    }
+    if ( builder.size() == 1 ) {
+      return builder.getList().get(0);
+    }
+    return builder.create();
   }
 }
