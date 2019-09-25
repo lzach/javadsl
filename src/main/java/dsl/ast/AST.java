@@ -91,7 +91,7 @@ public class AST {
   }
 
   public static AST STRLit(String value) {
-      if (value.charAt(0) == '$' ) {
+      if (value.length() > 0 && value.charAt(0) == '$' ) {
         return new AST("$String", new Object[]{"value", IDLit(value)}, (Object[])null);
       }
       return new AST("String", new Object[]{"value", IDLit(value)}, (Object[])null);
@@ -237,7 +237,7 @@ public class AST {
       args = args.substring(0, args.length() - 1);
     }
     if (args.length() == 0) return typeName;
-    return "(" + typeName + " " + args + ")";
+    return "(" + typeName + " " + args + ")\n";
   }
 
   public String getTypeName() {

@@ -1,0 +1,12 @@
+T__0=1
+T__1=2
+T__2=3
+COMMENT=4
+INTEGER=5
+NUM=6
+ID=7
+STRING=8
+WS=9
+';'=1
+'('=2
+')'=3

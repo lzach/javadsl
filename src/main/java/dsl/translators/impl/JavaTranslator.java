@@ -20,8 +20,6 @@ public class JavaTranslator implements StringTranslator {
     }
     switch (enforcedType) {
       case "Import":
-        str = "import ";
-
         return "import " + translate(ast.get("name"));
       case "Name":
         if ( ast.getMemberList().length > 0 ) {
@@ -141,25 +139,25 @@ public class JavaTranslator implements StringTranslator {
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
             str += translate(child);
-            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For") ) {
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default") ) {
               str += ";\n";
             }
           }
         }
         return str + "}\n";
       case "List":
-        AST delistify = delist(ast);
-        if (!Objects.equals(delistify.getTypeName(), "List")) {
-          return translate(delistify);
-        } else {
-          ast = delistify;
-        }
+//        AST delistify = delist(ast);
+//        if (!Objects.equals(delistify.getTypeName(), "List")) {
+//          return translate(delistify) + ";\n";
+//        } else {
+//          ast = delistify;
+//        }
 
         if ( ast.isList() && ast.getMemberList().length > 0 ) {
 
           for (AST child : ast.getMemberList()) {
             str += translate(child);
-            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For") ) {
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default") ) {
               str += ";\n";
             }
           }
@@ -171,23 +169,27 @@ public class JavaTranslator implements StringTranslator {
       case "Eq":
         return "Objects.equals(" + translate(ast.get("lhs")) + ", " + translate(ast.get("rhs")) + ")";
       case "Neq":
-        return translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "!=" + translate(ast.get("rhs")) +")";
       case "Lt":
-        return translate(ast.get("lhs")) + "<" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "<" + translate(ast.get("rhs")) +")";
       case "Gt":
-        return translate(ast.get("lhs")) + ">" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + ">" + translate(ast.get("rhs")) +")";
       case "Lte":
-        return translate(ast.get("lhs")) + "<=" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "<=" + translate(ast.get("rhs")) +")";
       case "Gte":
-        return translate(ast.get("lhs")) + ">=" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + ">=" + translate(ast.get("rhs")) +")";
       case "Add":
-        return translate(ast.get("lhs")) + "+" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "+" + translate(ast.get("rhs")) +")";
       case "Sub":
-        return translate(ast.get("lhs")) + "-" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "-" + translate(ast.get("rhs")) +")";
       case "Mul":
-        return translate(ast.get("lhs")) + "*" + translate(ast.get("rhs"));
+        return "(" + translate(ast.get("lhs")) + "*" + translate(ast.get("rhs")) +")";
       case "Div":
-        return translate(ast.get("lhs")) + "/" + translate(ast.get("rhs"));
+        return"(" +  translate(ast.get("lhs")) + "/" + translate(ast.get("rhs")) +")";
+      case "And":
+        return "(" + translate(ast.get("lhs")) + "&&" + translate(ast.get("rhs")) +")";
+      case "Or":
+        return "(" + translate(ast.get("lhs")) + "||" + translate(ast.get("rhs")) +")";
       case "Inc":
         return "++(" + translate(ast.get("value")) + ")";
       case "PostInc":
@@ -197,7 +199,6 @@ public class JavaTranslator implements StringTranslator {
       case "PostDec":
         return "(" + translate(ast.get("value")) + ")--";
       case "IntLit":
-        return ast.getValue().toString();
       case "IDLit":
         return ast.getValue().toString();
       case "String":

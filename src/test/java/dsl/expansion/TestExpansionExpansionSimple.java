@@ -58,7 +58,7 @@ public class TestExpansionExpansionSimple {
 
     AstCompiler.writeAST(expans, "ExpansionExpansionSimple_try" +repetitionInfo.getCurrentRepetition()+".java");
     if (repetitionInfo.getCurrentRepetition() > 1 ) {
-      assertEquals(expans, result, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
+      assertEquals(result, expans, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
     }
     result = expans;
 

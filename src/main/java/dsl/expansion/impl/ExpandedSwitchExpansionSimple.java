@@ -15,8 +15,6 @@ public class ExpandedSwitchExpansionSimple extends Expansion {
 
   public ExpandedSwitchExpansionSimple(AST expansion) {
     super(expansion);
-    update();
-    pushStack();
   }
 
   public AST expand() {

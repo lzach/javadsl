@@ -17,7 +17,6 @@ public class ExpandedExpansion extends Expansion {
   public ExpandedExpansion(AST expansion) {
     super(expansion);
     this.expansion = expansion;
-    update();
   }
 
 

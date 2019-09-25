@@ -30,7 +30,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   public ASTBuilder(AST ast) {
     this.typeName = ast.getTypeName();
     this.members = ast.getMemberMap();
-    if ( ast.getMemberList() != null ) {
+    if ( ast.getMemberList() != null && ast.getMemberList().length > 0 ) {
       this.memberList = new ArrayList<>(Arrays.asList(ast.getMemberList()));
     }
     this.value = ast.getValue();
@@ -87,7 +87,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   @Override
-  public ASTMemberBuilder add(String name, AST ast) {
+  public ASTBuilder add(String name, AST ast) {
     if ( members == null) {
       createMembers();
     }
@@ -95,7 +95,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
     return this;
   }
   @Override
-  public ASTMemberBuilder addAll(Map<String, AST> asts) {
+  public ASTBuilder addAll(Map<String, AST> asts) {
     if ( members == null) {
       createMembers();
     }
@@ -104,7 +104,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   @Override
-  public ASTListBuilder add(AST ast) {
+  public ASTBuilder add(AST ast) {
     if ( memberList == null ) {
       createMemberList();
     }
@@ -115,7 +115,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   @Override
-  public ASTListBuilder add(int index, AST ast) {
+  public ASTBuilder add(int index, AST ast) {
     if ( memberList == null ) {
       createMemberList();
     }
@@ -125,8 +125,19 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
     return this;
   }
 
+
+  public ASTBuilder add(int index, ASTBuilder ast) {
+    if ( memberList == null ) {
+      createMemberList();
+    }
+    if ( ast != null ) {
+      memberList.add(index, ast.create());
+    }
+    return this;
+  }
+
   @Override
-  public ASTListBuilder addAll(Collection<AST> asts) {
+  public ASTBuilder addAll(Collection<AST> asts) {
     if ( memberList == null ) {
       createMemberList();
     }
@@ -135,7 +146,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   }
 
   @Override
-  public ASTListBuilder addAll(AST ... asts) {
+  public ASTBuilder addAll(AST ... asts) {
     if ( memberList == null ) {
       createMemberList();
     }
@@ -145,6 +156,10 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
 
   public ASTBuilder set(Object value) {
     createValue(value);
+    return this;
+  }
+  public ASTBuilder setAdd(Object value) {
+    createValue((String)this.value + value);
     return this;
   }
 
