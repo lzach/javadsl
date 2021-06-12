@@ -9,7 +9,7 @@ public class PatGui extends JFrame {
     PatGame game;//= /*new KlondikeGame();//*/new DSLPatGame("golf.pat");
 
     PatGui(String gameName) {
-        game = /*new KlondikeGame();//*/new DSLPatGame(gameName + ".pat");
+        game = new PatienceKlondike();/*new KlondikeGame();//*///new DSLPatGame(gameName + ".pat");
         game.setup();
         add(new PatView(game));
     }

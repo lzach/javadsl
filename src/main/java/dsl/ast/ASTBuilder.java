@@ -241,11 +241,14 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
   public AST create() {
 
     AST ast = null;
+    if (typeName == null) {
+      typeName = "";
+    }
     if ( token != null ) {
       if (members != null) {
         ast = new AST(typeName, members, token);
       } else if (memberList != null) {
-        ast = new AST(typeName, token, memberList.toArray(new AST[memberList.size()]));
+        ast = new AST(typeName, token, memberList.toArray(new AST[0]));
       } else if (value != null) {
         ast = AST.create(typeName, value, token);
       } else {
@@ -255,7 +258,7 @@ public class ASTBuilder implements ASTMemberBuilder, ASTListBuilder {
       if (members != null) {
         ast = new AST(typeName, members);
       } else if (memberList != null) {
-        ast = new AST(typeName, memberList.toArray(new AST[memberList.size()]));
+        ast = new AST(typeName, memberList.toArray(new AST[0]));
       } else if (value != null) {
         ast = AST.create(typeName, value);
       } else {

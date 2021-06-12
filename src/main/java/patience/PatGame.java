@@ -31,6 +31,7 @@ public abstract class PatGame {
     public void move(Pile origin, Pile from, Pile to) {
       if ( from.equals(origin) ) return ;
       System.out.println(from);
+        System.out.println(from.bottom() + ", " + to.top());
       if ( canMovePile(from, to) ) {
         System.out.println("canMovePile!");
         to.addAll(from);

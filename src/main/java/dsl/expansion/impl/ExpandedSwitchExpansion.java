@@ -5,6 +5,7 @@ package dsl.expansion.impl;
 
 import dsl.ast.AST;
 import dsl.ast.ASTBuilder;
+import dsl.ast.ASTMemberBuilder;
 import dsl.expansion.Expansion;
 
 import java.sql.RowIdLifetime;
@@ -614,7 +615,49 @@ public class ExpandedSwitchExpansion extends Expansion {
           }
         }
         break;
+    case "if_member":
+        builder.setName("List");
+        builder.add(new AST("Comment", ast));
+        if (ast.hasMember("otherwise")) {
+          builder.add(expand(ast.get("otherwise")));
+        }
+        builder.add( expand(ast.get("code")));
+        builder.add( expand(ast.get("member")));
+        ASTMemberBuilder if_ast = new ASTBuilder("If")
+              .add("cond",
+                      new ASTBuilder("Eq")
+                              .add("lhs", new ASTBuilder())
+                              .add("rhs", new ASTBuilder("Call")
+                                      .add("function",
+                                              new ASTBuilder("Member")
+                                                      .add("lhs", AST.IDLit("bQue"))
+                                                      .add("rhs", AST.IDLit("pop"))
+                                                      .create())
+                                      .add("args", AST.emptyList("ArgList"))
+                                      .create())
+              )
+              .add("code", new ASTBuilder("Call")
+                      .add("function",
+                              new ASTBuilder("Member")
+                                      .add("lhs", AST.IDLit("bQue"))
+                                      .add("rhs", AST.IDLit("pop"))
+                                      .create())
+                      .add("args", AST.emptyList("ArgList"))
+                      .create());
+        if ( ast.hasMember("otherwise") ) {
+              if_ast.add("otherwise", new ASTBuilder("Call")
+                  .add("function",
+                          new ASTBuilder("Member")
+                                  .add("lhs", AST.IDLit("bQue"))
+                                  .add("rhs", AST.IDLit("pop"))
+                                  .create())
+                  .add("args", AST.emptyList("ArgList"))
+                  .create());
+        }
 
+      builder.add(if_ast);
+
+        break;
       case "callExpansion":
         return createPushWithCreate(createCall(
             new ASTBuilder("Call")

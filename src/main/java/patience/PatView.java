@@ -69,7 +69,7 @@ public class PatView extends JPanel {
           try {
             cardImages[i] = ImageIO.read(new File("patience/images/" + cardNames[i] + ".png"));
           } catch ( Exception e ) {
-            System.out.println("Couldn't load " + cardNames + ".png" );
+            System.out.println("Couldn't load " + cardNames[i] + ".png" );
           }
         }
         addMouseMotionListener(new MouseMotionListener() {

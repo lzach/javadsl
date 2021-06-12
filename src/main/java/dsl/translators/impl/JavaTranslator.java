@@ -54,6 +54,23 @@ public class JavaTranslator implements StringTranslator {
            comma = ",";
          }
          return str + ">";
+      case "Array":
+      case "NArray":
+        if (!ast.hasMember("values")) {
+          return translate(ast.get("type")) + "[]";
+        } else {
+          str = "new " + translate(ast.get("type")) + "[]{\n";
+          if ( ast.get("values").getMemberList().length > 0 ) {
+            for (int i = 0; i < ast.get("values").getMemberList().length; ++i) {
+              AST child = ast.get("values").getMemberList()[i];
+              str += translate(child);
+              if ( i <  ast.get("values").getMemberList().length-1) {
+                str += ",";
+              }
+            }
+          }
+          return str + "}\n";
+        }
       case "Member":
         return translate(ast.get("lhs")) + "." + translate(ast.get("rhs"));
       case "Call":
@@ -65,9 +82,9 @@ public class JavaTranslator implements StringTranslator {
 	      return " ";
       case "Attr":
       case "Define":
-        return translate(ast.get("type")) + " " + translate(ast.get("name"));
       case "Param":
         return translate(ast.get("type")) + " " + translate(ast.get("name"));
+//        return translate(ast.get("type")) + " " + translate(ast.get("name"));
       case "Arg":
         return translate(ast.get("value"));
       case "ParamList":
@@ -139,7 +156,7 @@ public class JavaTranslator implements StringTranslator {
         if ( ast.getMemberList().length > 0 ) {
           for (AST child : ast.getMemberList()) {
             str += translate(child);
-            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default") ) {
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default|Block|List|Comment") ) {
               str += ";\n";
             }
           }
@@ -157,14 +174,12 @@ public class JavaTranslator implements StringTranslator {
 
           for (AST child : ast.getMemberList()) {
             str += translate(child);
-            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default") ) {
+            if ( !child.getTypeName().matches("Select|Class|Method|If|While|For|Default|Block|List|Comment") ) {
               str += ";\n";
             }
           }
         }
-        if ( str.length() > 0 ) {
-            str = str.substring(0, str.length() - 1);
-        }
+
         return str;
       case "Eq":
         return "Objects.equals(" + translate(ast.get("lhs")) + ", " + translate(ast.get("rhs")) + ")";
@@ -190,6 +205,8 @@ public class JavaTranslator implements StringTranslator {
         return "(" + translate(ast.get("lhs")) + "&&" + translate(ast.get("rhs")) +")";
       case "Or":
         return "(" + translate(ast.get("lhs")) + "||" + translate(ast.get("rhs")) +")";
+      case "Not":
+        return "!(" + translate(ast.get("value")) + ")";
       case "Inc":
         return "++(" + translate(ast.get("value")) + ")";
       case "PostInc":
@@ -207,6 +224,7 @@ public class JavaTranslator implements StringTranslator {
         }
         return "\"" + ast.getValue() + "\"";
       case "ID":
+      case "$":
         return ast.getValue().toString();
       case "Comment":
         return "/* " +ast.getMemberList()[0].getToken() + ": " + ast.getMemberList()[0] + " */";

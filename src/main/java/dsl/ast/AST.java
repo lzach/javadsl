@@ -108,10 +108,16 @@ public class AST {
   }
 
   public static AST create(String type, Object value) {
+    if (Objects.equals(type, "STRLit")) {
+      return STRLit(value.toString());
+    }
     return new AST(type, value);
   }
 
   public static AST create(String typeName, Object value, Token token) {
+    if (Objects.equals(typeName, "STRLit")) {
+      return STRLit(value.toString());
+    }
     return new AST(typeName, value, token);
   }
 

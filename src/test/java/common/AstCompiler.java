@@ -8,6 +8,7 @@ import dsl.translators.impl.JavaTranslator;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,7 +44,9 @@ public class AstCompiler {
         new File(AstCompiler.BUILD_PATH + className  + ".class").delete();
 
         Process pro = Runtime.getRuntime().exec("javac -d " + BUILD_PATH + " -g -cp " + BUILD_PATH + " " + outputName);
-        pro.waitFor();
+        if(!pro.waitFor(1, TimeUnit.MINUTES)) {
+            pro.destroyForcibly();
+        }
         BufferedReader is = new BufferedReader(new InputStreamReader(pro.getInputStream()));
         String line;
         while ( (line = is.readLine()) != null ) {

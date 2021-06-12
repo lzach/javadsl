@@ -73,13 +73,16 @@ public class Parser {
       case ID:
         typ = "ID";
         val = value.getValue();
+        if (val.equals("$")) {
+          return AST.create(val.toString(), val, value);
+        }
         //if ( symbols.containsKey(val) ) {
         //  return AST.create((String)val);
         //}
         //Map<String, AST> typeMap = new HashMap<>();
         //typeMap.put("reference", AST.create("IDLit", val));
         //return new AST("NameLit", typeMap);
-	break;
+        break;
       case NUM:
         if ( value.getValue().matches("[eE.]") ) {
           typ = "Float";

@@ -37,7 +37,9 @@ public class TestPatienceExpansion {
   }
 
   private static String expansionClassName = "dsl.expansion.impl.ExpandedSwitchExpansion"; // Original expander
+  private static String repeatExpander = null;
   private static AST result = null; // result of expansion
+  private static AST patResult = null; // result of expansion
 
   @Test
   public void testPatienceExpansion() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
@@ -58,6 +60,34 @@ public class TestPatienceExpansion {
     assertNotNull(exp);
 
     AstCompiler.compileAST(exp, "PatienceKlondike");
+  }
+
+  @RepeatedTest(3)
+  public void testRepeatCompile(RepetitionInfo repetitionInfo) throws IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, InterruptedException, ClassNotFoundException {
+
+    String outputClass = "ExpansionPatience" ;
+    if (repeatExpander == null ) {
+      repeatExpander = expansionClassName;
+    }
+
+    AST expans = AstCompiler.expand(expansion, (Class<Expansion>)new CustomClassLoader().loadClass(repeatExpander));
+
+    AstCompiler.writeAST(expans, "ExpansionPatience_try" +repetitionInfo.getCurrentRepetition()+".java");
+    if (repetitionInfo.getCurrentRepetition() > 2 ) {
+      assertEquals(result, expans, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
+    }
+    result = expans;
+
+    AstCompiler.compileAST(expans, outputClass);
+    AST exp = AstCompiler.expand(patience, (Class<Expansion>)new CustomClassLoader().loadClass(outputClass));
+    assertNotNull(exp);
+    if (repetitionInfo.getCurrentRepetition() > 1 ) {
+      assertEquals(result, exp, () -> "Expansion " + repetitionInfo.getCurrentRepetition() + " doesn't match expansion " + (repetitionInfo.getCurrentRepetition()-1));
+    }
+    patResult = exp;
+    AstCompiler.compileAST(exp, "PatienceKlondike");
+
+    repeatExpander = outputClass;
   }
 
 

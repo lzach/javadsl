@@ -63,7 +63,7 @@ public class Token {
   }
 
   public enum Type {
-    WS, ID, OP, NUM, STR, ERROR, EOF;
+    WS, ID, OP, NUM, STR, DOLLAR, ERROR, EOF;
   }
 
   public String toString() {

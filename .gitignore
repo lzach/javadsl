@@ -1,4 +1,7 @@
 .idea/
-javadsl.iml
+*.iml
 build/
 target/
+thoughts.txt
+Expansion*_try*.java
+extracts/
